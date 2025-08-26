@@ -11,8 +11,9 @@ export async function setTokenCookie(name: string, value: string, maxAge: number
     value,
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    maxAge
+    sameSite: 'lax',
+    path: '/',
+    maxAge,
   });
 }
 
@@ -22,7 +23,7 @@ export async function deleteTokenCookie(name: string) {
   cookieStore.delete(name);
 }
 
-export async function getTokenFromCookie(name: string) {
+export async function getTokenFromCookie(name: string): Promise<string | null> {
   const cookieStore = await cookies();
-  return cookieStore.get(name)?.value;
+  return cookieStore.get(name)?.value || null;
 }
