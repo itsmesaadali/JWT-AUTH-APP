@@ -1,4 +1,5 @@
 import { createPool, Pool } from "mysql2/promise";
+import { CREATE_TABLE_USERS } from "./tables";
 
 let pool: Pool;
 
@@ -13,6 +14,7 @@ const connectToDatabase = async () => {
     });
 
     await pool.getConnection();
+    await pool.execute(CREATE_TABLE_USERS)
     console.log('Connected to MYSQL')
   } catch (error) {
     console.log('Error Connected', error);
