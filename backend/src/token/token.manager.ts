@@ -15,13 +15,13 @@ export const generateToken = (
   return token;
 };
 
-export const saveRefreshToken = async (token: string) => {
+export const saveRefreshToken = async (token: string, encryptedToken:string) => {
   try {
     const decodeData = jwt.decode(token, { json: true });
     if (!decodeData) throw new Error("Unable to decode token");
     const key = generateRedisKey(decodeData.id);
     const TTL = generateTTL(decodeData.exp!);
-    await setCache(key, encryptData(token), TTL);
+    await setCache(key, encryptedToken, TTL);
     console.log("Save refresh Token");
   } catch (error) {
     console.log('Error is save refresh Token', error);

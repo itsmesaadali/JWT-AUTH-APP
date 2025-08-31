@@ -1,5 +1,7 @@
 import crypto from "crypto";
+import { config } from 'dotenv'
 
+config();
 const key = Buffer.from(process.env.ENCRYPTION_KEY!, "base64");
 const iv = crypto.randomBytes(16);
 const algorithm = "aes-256-cbc";
@@ -12,7 +14,7 @@ export const encryptData = (data: string) => {
   return encrypted;
 };
 
-const decryptData = (encrypted: string) => {
+export const decryptData = (encrypted: string) => {
   const decipher = crypto.createDecipheriv(algorithm, key, iv);
   let decrypted = decipher.update(encrypted, "hex", "utf8");
   decrypted += decipher.final("utf8");

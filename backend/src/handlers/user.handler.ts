@@ -24,15 +24,55 @@ const getUserBy = async (by: "email" | "id", value: string) => {
   }
 };
 
-const setAuthTokens = async(id: string, email: string, res: Response) => {
+const setCookies = (
+  accessToken: string,
+  refreshToken: string,
+  res: Response
+) => {
+  res.clearCookie("access_token", {
+    domain: "localhost",
+    httpOnly: true,
+    path: "/",
+  });
+
+  res.clearCookie("refresh_token", {
+    domain: "localhost",
+    httpOnly: true,
+    path: "/",
+  });
+
+  const expiryAccessToken = new Date(new Date().getTime() + 60 * 60 * 1000);
+  const expiryRefreshToken = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000);
+  res.cookie('access_token', accessToken, {
+    domain:'localhost',
+    httpOnly:true,
+    path:'/',
+    expires:expiryAccessToken,
+    sameSite:'lax'
+  })
+
+  res.cookie('refresh_token', refreshToken, {
+    domain:'localhost',
+    httpOnly:true,
+    path:'/',
+    expires:expiryRefreshToken,
+    sameSite:'lax'
+  })
+
+  return;
+};
+
+const setAuthTokens = async (id: string, email: string, res: Response) => {
   try {
     const accessToken = generateToken(id, email, "access");
     const refreshToken = generateToken(id, email, "refresh");
-    await saveRefreshToken(refreshToken)
+    const encryptedToken = encryptData(refreshToken);
+    await saveRefreshToken(refreshToken, encryptedToken);
+    setCookies(accessToken, encryptedToken, res)
   } catch (error) {
-    
+    console.log('Error while seting auth token ');
+    throw error;
   }
-
 };
 
 const getUser = async (req: Request, res: Response) => {
@@ -81,6 +121,7 @@ const registerUser = async (req: Request, res: Response) => {
       hashPassword,
     ]);
     console.log("User inserted", result[0]);
+    // await setAuthTokens(String(result.insertId),email, res )
     return res.status(200).json({ message: "user inserted", user: result[0] });
   } catch (error) {
     console.log("Get user error", error);
@@ -109,6 +150,7 @@ const loginUser = async (req: Request, res: Response) => {
     }
 
     // set token
+    await setAuthTokens(String(user.id),email, res )
 
     return res.status(200).json({ message: "user detailed", user: user });
   } catch (error) {
