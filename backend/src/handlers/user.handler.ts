@@ -120,8 +120,10 @@ const registerUser = async (req: Request, res: Response) => {
       email,
       hashPassword,
     ]);
-    console.log("User inserted", result[0]);
-    // await setAuthTokens(String(result.insertId),email, res )
+    // @ts-ignore
+    const insertId = result[0].insertId as number;
+    console.log("User inserted", result);
+    await setAuthTokens(String(insertId),email, res )
     return res.status(200).json({ message: "user inserted", user: result[0] });
   } catch (error) {
     console.log("Get user error", error);
