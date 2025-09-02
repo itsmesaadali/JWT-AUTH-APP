@@ -6,7 +6,7 @@ const inputStyle = "px-2 py-1 bg-gray-100 rounded-lg";
 
 type props = {
   isSingup: boolean;
-  action: (f: FormData) => Promise<void>;
+  action: (prevState:unknown,f: FormData) => Promise<void>;
 };
 
 const AuthForm = ({ isSingup, action }: props) => {
