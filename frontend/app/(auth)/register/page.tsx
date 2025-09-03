@@ -1,8 +1,10 @@
+import { signupAction } from "../../actions/form-action"
+import AuthForm from "../AuthForm"
 
 const page = () => {
   return (
     <div>
-        Singup
+        <AuthForm isSingup action={signupAction}/>
     </div>
   )
 }
