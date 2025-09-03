@@ -3,6 +3,8 @@
 import axios from "axios";
 
 import { LoginFromSchema, SignUpFromSchema } from "../lib/definitions";
+import setCookieParser from 'set-cookie-parser'
+import { cookies } from "next/headers";
 
 export const loginAction = async(prevState:unknown, formData:FormData) => {
   console.log(prevState)
@@ -25,6 +27,12 @@ export const loginAction = async(prevState:unknown, formData:FormData) => {
   try {
     const res= await axios.post('/user/login',{email, password});
     const data = await res.data;
+    const cookieStore = await cookies()
+    const cookieData = setCookieParser(res.headers['set-cookie']!) 
+
+    cookieData.forEach((cookie) => 
+      // @ts-ignore
+      cookieStore.set(cookie.name,cookie.value, {...cookie}))
     return data;
   } catch (error) {
     console.log('Error occur login',error)
