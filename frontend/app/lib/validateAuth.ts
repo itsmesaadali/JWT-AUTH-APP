@@ -8,17 +8,18 @@ export const validateAuth = async () => {
     const accessToken = (await cookieStore.get("access_token"))?.value;
     const refreshToken = (await cookieStore.get("refresh_token"))?.value;
 
-    const res = await axios.get(URL, {
+    const res = await axios.put(URL,{}, {
+      withCredentials: true,
       headers: {
         Authorization: `access_token=${accessToken}, refresh_token=${refreshToken}`,
       },
     });
 
     const data = await res.data;
-    console.log('Response for validate  ',data)
-    return data
+    console.log("Response for validate  ", data);
+    return data;
   } catch (error) {
-    console.log('Error for validate', error)
-    throw error
+    console.log("Error for validate", error);
+    throw error;
   }
 };

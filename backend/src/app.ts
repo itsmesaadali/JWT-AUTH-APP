@@ -16,6 +16,12 @@ app.use(express.urlencoded({extended:true}));
 app.use(helmet())
 app.use(morgan('dev'))
 
+app.use((req, res, next) => {
+    console.log('Req Url', req.baseUrl+ req.url)
+    console.log(JSON.stringify(req.headers))
+    next()
+})
+
 app.use('/api/v1/auth', appRouter)
 
 export default app;
