@@ -4,7 +4,7 @@ import { validateAuth } from "./app/lib/validateAuth";
 
 export const middleware = async( req:NextRequest) => {
      const cookieStore = await cookies();
-     if(!cookieStore.get('access_token') || !cookieStore.get('refresh_token')) {
+     if(!cookieStore.get('refresh_token')) {
         const url = req.nextUrl.clone();
         url.pathname = '/login';
         return NextResponse.rewrite(url)
