@@ -24,7 +24,7 @@ const getUserBy = async (by: "email" | "id", value: string) => {
   }
 };
 
-const setCookies = (
+export const setCookies = (
   accessToken: string,
   refreshToken: string,
   res: Response

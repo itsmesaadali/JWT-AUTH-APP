@@ -23,5 +23,9 @@ app.use((req, res, next) => {
 })
 
 app.use('/api/v1/auth', appRouter)
+// @ts-ignore
+app.use((err, req, res,next) => {
+    return res.status(500).json({message:'Error'})
+})
 
 export default app;

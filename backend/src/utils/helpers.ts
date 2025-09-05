@@ -24,7 +24,7 @@ export const validateAccessToken = async(token:string) => {
     try {
         const decryptedData = await verifyAndDecode(token)
         if(decryptedData) {
-            return decryptedData
+            return true
         }
         else
         {
@@ -32,7 +32,7 @@ export const validateAccessToken = async(token:string) => {
         }
     } catch (error) {
         console.log('unable the accessToken', error)
-        throw error
+        return false
     }
 }
 
@@ -77,6 +77,6 @@ export const validateRefreshToken = async(token:string) => {
 
     } catch (error) {
         console.log('unexpected error during valdation token', error)
-        throw error
+        return false 
     }
 }
