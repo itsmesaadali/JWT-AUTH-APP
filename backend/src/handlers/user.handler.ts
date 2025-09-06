@@ -77,6 +77,27 @@ const setAuthTokens = async (id: string, email: string, res: Response) => {
 
 const getUser = async (req: Request, res: Response) => {
   try {
+    const id = res.locals.jwtData.id;
+    if (!id || isNaN(Number(id))) {
+      return res.status(400).json({ message: "Invalid user id " });
+    }
+
+    const user = await getUserBy("id", id);
+    if (!user) {
+      console.log("User not found");
+
+      return res.status(401).json({ message: "user not found" });
+    }
+    return res.status(200).json({ message: "user retrieved", user: user });
+  } catch (error) {
+    console.log("Get user error", error);
+    return res.status(500).json({ message: "Unexpected error" });
+    throw error;
+  }
+};
+
+const getUserById = async (req: Request, res: Response) => {
+  try {
     const id = req.params.id;
     if (!id || isNaN(Number(id))) {
       return res.status(400).json({ message: "Invalid user id " });
@@ -95,6 +116,7 @@ const getUser = async (req: Request, res: Response) => {
     throw error;
   }
 };
+
 
 const registerUser = async (req: Request, res: Response) => {
   try {
@@ -162,4 +184,4 @@ const loginUser = async (req: Request, res: Response) => {
   }
 };
 
-export { getUser, registerUser, loginUser };
+export { getUser, registerUser, loginUser, getUserById };
