@@ -1,26 +1,41 @@
-import { MiddlewareConfig, NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { validateAuth } from "./app/lib/validateAuth";
+import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
 
-export const middleware = async( req:NextRequest) => {
-     const cookieStore = await cookies();
-     if(!cookieStore.get('refresh_token')) {
-        const url = req.nextUrl.clone();
-        url.pathname = '/login';
-        return NextResponse.rewrite(url)
-     }
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get("auth_token")?.value
+  const refreshToken = request.cookies.get("refresh_token")?.value
+  const { pathname } = request.nextUrl
 
-     const authData = await validateAuth();
+  // Protected routes that require authentication
+  const protectedRoutes = ["/profile", "/dashboard", "/settings"]
+  const authRoutes = ["/login", "/register", "/forgot-password"]
 
-     if(!authData || !authData.success) {
-        const url = req.nextUrl.clone();
-        url.pathname = '/login';
-        return NextResponse.rewrite(url)
-     }
+  const isProtectedRoute = protectedRoutes.some((route) => pathname.startsWith(route))
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route))
 
-     return NextResponse.next()
+  // Redirect authenticated users away from auth pages
+  if (isAuthRoute && token) {
+    return NextResponse.redirect(new URL("/profile", request.url))
+  }
+
+  // Redirect unauthenticated users to login
+  if (isProtectedRoute && !token) {
+    const loginUrl = new URL("/login", request.url)
+    loginUrl.searchParams.set("redirect", pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  // Add security headers
+  const response = NextResponse.next()
+
+  response.headers.set("X-Frame-Options", "DENY")
+  response.headers.set("X-Content-Type-Options", "nosniff")
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
+  response.headers.set("X-XSS-Protection", "1; mode=block")
+
+  return response
 }
 
-export const config: MiddlewareConfig = {
-    matcher:'/profile'
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|public).*)"],
 }

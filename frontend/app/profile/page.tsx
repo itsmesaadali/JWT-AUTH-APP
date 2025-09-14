@@ -1,33 +1,27 @@
-import axios from "axios";
-import { cookies } from "next/headers";
+"use client"
 
-type Response = {
-  message:string,
-  user:{
-    id:number;
-    name:string;
-    email:string;
-  }
+import { ProtectedRoute } from "@/components/auth/protected-route"
+import { ProfileForm } from "@/components/auth/profile-form"
+import { ProfileSidebar } from "@/components/auth/profile-sidebar"
+
+export default function ProfilePage() {
+  return (
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid lg:grid-cols-4 gap-8">
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <ProfileSidebar />
+            </div>
+
+            {/* Main Content */}
+            <div className="lg:col-span-3">
+              <ProfileForm />
+            </div>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  )
 }
-
-const getUser = async () => {
-  const cookieStore = await cookies();
-  const accessToken = (await cookieStore.get("access_token"))?.value;
-  const refreshToken = (await cookieStore.get("refresh_token"))?.value;
-  const res = await axios.get("/user/me", {
-    withCredentials: true,
-    headers: {
-      Authorization: `access_token=${accessToken}, refresh_token=${refreshToken}`,
-    },
-  });
-
-  const data = await res.data as Response;
-  return data;
-};
-
-const profielPage = async () => {
-  const user = await getUser()
-  return <div>{JSON.stringify(user)}</div>;
-};
-
-export default profielPage;

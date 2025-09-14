@@ -1,20 +1,20 @@
-import app from "./app";
-import { config } from "dotenv";
-import { connectToDatabase } from "./mysql/connection";
-import { initializeRedis } from "./redis/connection";
+import app  from "./app";
+import { config } from "./config/app.config";
+import connectDB from "./database/database";
 
-config();
+connectDB()
+  .then(() => {
+    app.on("error", (error) => {
+      console.log("Server isNot running =>", error);
+      throw error;
+    });
 
-const init = async () => {
-  try {
-    await connectToDatabase();
-    await initializeRedis();
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => console.log("Backend Running on Port", PORT));
-  } catch (error) {
-    console.log('App running error', error);
-    process.exit(1)
-  }
-};
-
-init();
+    app.listen(config.PORT, async () => {
+      console.log(
+        `Server listening on port ${config.PORT} in ${config.NODE_ENV}`
+      );
+    });
+  })
+  .catch((error) => {
+    console.log("MongoDb connection failed", error);
+  });
