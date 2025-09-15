@@ -8,7 +8,8 @@ type CookiePayloadType = {
     refreshToken:string;
 }
 
-export const REFRESH_PATH = `/`;
+export const REFRESH_PATH = `/api/v1/auth/refresh`;
+
 
 const defaults: CookieOptions = {
     httpOnly:true,
