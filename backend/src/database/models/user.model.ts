@@ -8,33 +8,45 @@ export interface UserDocument extends Document {
   password: string;
   avatar: string;
   refreshToken: string;
+  authProvider: 'local' | 'google'; // Add this field
+  googleId?: string; // Add Google ID
   createdAt: Date;
   updatedAt: Date;
   comparePassword(value: string): Promise<boolean>;
   createAccessToken(): string;
   createRefreshToken(): string;
-  toSafeObject(): any; // Add this method
+  toSafeObject(): any;
 }
 
 const userSchema = new Schema<UserDocument>(
   {
     name: { type: String, required: true },
     email: { type: String, unique: true, required: true },
-    password: { type: String, required: true },
+    password: { type: String, required: function() { return this.authProvider === 'local'; } },
     avatar: { type: String },
     refreshToken: { type: String },
+    authProvider: { 
+      type: String, 
+      enum: ['local', 'google'], 
+      default: 'local',
+      required: true 
+    },
+    googleId: { type: String, sparse: true }, // Google ID for Google users
   },
   { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
+  if (this.isModified("password") && this.authProvider === 'local') {
     this.password = await hashValue(this.password);
   }
   next();
 });
 
 userSchema.methods.comparePassword = async function (value: string) {
+  if (this.authProvider !== 'local') {
+    throw new Error('Password comparison only available for local authentication');
+  }
   return compareValue(value, this.password);
 };
 
@@ -52,7 +64,6 @@ userSchema.methods.createRefreshToken = function () {
   });
 };
 
-// Add this method to the schema
 userSchema.methods.toSafeObject = function () {
   const userObject = this.toObject();
   delete userObject.password;

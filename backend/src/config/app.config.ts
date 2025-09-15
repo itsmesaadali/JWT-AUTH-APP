@@ -13,6 +13,10 @@ const appConfig = () => ({
     ACCESS_TOKEN_EXPIRY: getEnv("ACCESS_TOKEN_EXPIRY", "1h") as "1h" | "2h" | "30m" | "7d" | string, // 👈 union
     REFRESH_TOKEN_EXPIRY: getEnv("REFRESH_TOKEN_EXPIRY", "30d") as "7d" | "30d" | string,
   },
+  GOOGLE : {
+     GOOGLE_CLIENT_ID: getEnv('GOOGLE_CLIENT_ID'),
+    GOOGLE_CLIENT_SECRET: getEnv('GOOGLE_CLIENT_SECRET'),
+  },
     MAILER_SENDER: getEnv('MAILER_SENDER'),
     RESEND_API_KEY: getEnv('RESEND_API_KEY') 
 })

@@ -12,20 +12,35 @@ import {
 } from "../../common/utils/jwt";
 import { config } from "../../config/app.config";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+import { hashValue } from "../../common/utils/bcrypt";
 
 export class AuthService {
+
+  private googleClient:OAuth2Client;
+
+   constructor() {
+    this.googleClient = new OAuth2Client(config.GOOGLE.GOOGLE_CLIENT_ID);
+  }
+
   public async register(registerData: RegisterDto) {
     const { name, email, password } = registerData;
 
-    const existingUser = await UserModel.exists({ email });
+    const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
+      if (existingUser.authProvider === 'google') {
+        throw new BadRequestException(
+          "This email is registered with Google. Please use Google Sign-In.",
+          ErrorCode.AUTH_GOOGLE_ACCOUNT
+        );
+      }
       throw new BadRequestException(
         "User already exists with this email",
         ErrorCode.AUTH_EMAIL_ALREADY_EXISTS
       );
     }
 
-    const newUser = await UserModel.create({ name, email, password });
+    const newUser = await UserModel.create({ name, email, password, authProvider:'local' });
 
     return { user: newUser.toSafeObject()  };
   }
@@ -38,6 +53,14 @@ export class AuthService {
       throw new BadRequestException(
         "Invalid email or password provided",
         ErrorCode.AUTH_NOT_FOUND
+      );
+    }
+
+     // Check if user registered with Google
+    if (user.authProvider === 'google') {
+      throw new BadRequestException(
+        "This email is registered with Google. Please use Google Sign-In.",
+        ErrorCode.AUTH_GOOGLE_ACCOUNT
       );
     }
 
@@ -65,6 +88,78 @@ export class AuthService {
 
     return { user: user.toSafeObject() , accessToken, refreshToken };
   }
+
+   public async googleAuth(token: string) {
+    try {
+      // Verify Google token
+      const ticket = await this.googleClient.verifyIdToken({
+        idToken: token,
+        audience: config.GOOGLE.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      
+      if (!payload || !payload.email) {
+        throw new BadRequestException("Invalid Google token");
+      }
+
+      const { email, name, picture, sub: googleId } = payload;
+
+      // Check if user exists
+      let user = await UserModel.findOne({ 
+        $or: [{ email }, { googleId }] 
+      });
+
+      if (user) {
+        // User exists - check if it's a local account
+        if (user.authProvider === 'local') {
+          throw new BadRequestException(
+            "This email is already registered with email/password. Please login with your password.",
+            ErrorCode.AUTH_LOCAL_ACCOUNT
+          );
+        }
+
+        // Update Google user info if needed
+        if (!user.avatar && picture) {
+          user.avatar = picture;
+          await user.save();
+        }
+      } else {
+        // Create new Google user
+        user = await UserModel.create({
+          name: name || email.split('@')[0],
+          email,
+          avatar: picture,
+          authProvider: 'google',
+          googleId,
+          password: await hashValue(Math.random().toString(36).slice(-12)), // Random password for schema validation
+        });
+      }
+
+      // Generate tokens
+      const accessToken = generateAccessToken({
+        _id: String(user._id),
+        email: user.email,
+        name: user.name,
+      });
+
+      const refreshToken = generateRefreshToken({
+        _id: String(user._id),
+      });
+
+      // Save refresh token to database
+      user.refreshToken = refreshToken;
+      await user.save();
+
+      return { user: user.toSafeObject(), accessToken, refreshToken };
+    } catch (error: any) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException("Google authentication failed");
+    }
+  }
+
 
   public async refreshToken(refreshToken: string) {
     try {
@@ -99,7 +194,7 @@ export class AuthService {
   }
 
   public async forgotPassword(email: string) {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email, authProvider: 'local' });
     if (!user) {
       throw new NotFoundException("Invalid email, Please check again");
     }

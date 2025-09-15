@@ -7,7 +7,7 @@ import {
   getAccessTokenCookieOptions,
   setAuthenticationCookies,
 } from "../../common/utils/cookie";
-import { UnauthorizedException } from "../../common/utils/catch-errors";
+import { BadRequestException, UnauthorizedException } from "../../common/utils/catch-errors";
 import { clearAuthenticationCookies } from "../../common/utils/date-time";
 
 // Create a custom interface that extends Request
@@ -40,6 +40,24 @@ export class AuthController {
       .status(HTTPSTATUS.OK)
       .json({
         message: "User login successfully",
+        user,
+      });
+  });
+
+
+   public googleAuth = asyncHandler(async (req: Request, res: Response) => {
+    const { token } = req.body;
+    
+    if (!token) {
+      throw new BadRequestException("Google token is required");
+    }
+
+    const { user, accessToken, refreshToken } = await this.authService.googleAuth(token);
+
+    return setAuthenticationCookies({ res, accessToken, refreshToken })
+      .status(HTTPSTATUS.OK)
+      .json({
+        message: "Google authentication successful",
         user,
       });
   });
