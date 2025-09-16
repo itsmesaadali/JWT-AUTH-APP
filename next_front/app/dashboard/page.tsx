@@ -1,32 +1,27 @@
 'use client';
 
-import ProtectedRoute from '@/components/ProtectedRoute';
+// Remove the import of useCurrentUser
+// import { useCurrentUser } from '@/hooks/useCurrentUser'; 
+// We will get the user data from a context or a prop if we were to refactor further.
+// For now, we will simply rely on the fact that the page is protected.
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
-// It's good practice to put the client logic in its own component
 const DashboardContent = () => {
-  // 1. Get user data and loading state from our custom hook
+  // Now, this is the only place this hook is called for the user data.
   const { user, isLoading } = useCurrentUser();
-    // Add this console.log to see what the hook returns
-  console.log('User object from hook:', user);
-  console.log('Is Loading:', isLoading);
 
-  // 2. Show a loading message while fetching user data
   if (isLoading) {
     return <div>Loading user details...</div>;
   }
-
-  // 3. Render the user details once loaded
+  
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Dashboard</h1>
       <p>Welcome back! 🎉 Only logged-in users can see this page.</p>
       
-      {/* Display user information */}
       {user && (
         <div style={{ marginTop: '2rem', border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
           <h3>User Profile</h3>
-          {/* Use optional chaining (?.) to safely access properties */}
           {user?.avatar && (
             <img 
               src={user.avatar} 
@@ -43,11 +38,4 @@ const DashboardContent = () => {
   );
 };
 
-
-export default function DashboardPage() {
-  return (
-    <ProtectedRoute>
-      <DashboardContent />
-    </ProtectedRoute>
-  );
-}
+export default DashboardContent;
