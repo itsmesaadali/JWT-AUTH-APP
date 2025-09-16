@@ -73,7 +73,7 @@ export const authApi = {
   },
   getCurrentUser: async () => {
     const response = await api.get('/users/me');
-    return response.data;
+    return response.data.user;
   },
   verifyEmail: async (token: string) => {
     const response = await api.get(`/auth/verify-email/${token}`);

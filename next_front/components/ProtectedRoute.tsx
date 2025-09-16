@@ -1,27 +1,30 @@
-// components/ProtectedRoute.tsx
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, isLoading, isAuthenticated } = useCurrentUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
+    // If loading is finished and the user is not authenticated, redirect
+    if (!isLoading && !isAuthenticated) {
       router.push('/login');
     }
-  }, [user, loading, router]);
+  }, [isLoading, isAuthenticated, router]);
 
-  if (loading) {
+  // While loading, show a loader
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!user) {
-    return null;
+  // If authenticated, render the children components
+  if (isAuthenticated) {
+    return <>{children}</>;
   }
 
-  return <>{children}</>;
+  // Otherwise, render nothing (as the redirect will happen)
+  return null;
 }

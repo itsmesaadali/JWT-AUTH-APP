@@ -1,91 +1,53 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { authApi, User } from '@/lib/api/auth.api';
+import React, { createContext, useContext } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { authApi, LoginCredentials, RegisterData, User } from '@/lib/api/auth.api';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
-  register: (userData: { name: string; email: string; password: string }) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (userData: RegisterData) => Promise<void>;
   googleLogin: (token: string) => Promise<void>;
   logout: () => Promise<void>;
-  refreshAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
-  useEffect(() => {
-    let isMounted = true;
-    const initAuth = async () => {
-      if (window.location.pathname === '/login') {
-        if (isMounted) setLoading(false);
-        return;
-      }
-      try {
-        setLoading(true);
-        const userData = await authApi.getCurrentUser();
-        if (isMounted) setUser(userData);
-      } catch (error) {
-        if (isMounted) setUser(null);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-    initAuth();
-    return () => {
-      isMounted = false;
-    };
-  }, []); // Single useEffect, runs on mount
-
-  const refreshAuth = async () => {
-    try {
-      setLoading(true);
-      const userData = await authApi.getCurrentUser();
-      setUser(userData);
-    } catch (error) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+  const handleAuthSuccess = (user: User) => {
+    // Manually set the user data in the cache after login/register
+    queryClient.setQueryData(['currentUser'], user);
+    router.push('/dashboard'); // Redirect on success
   };
 
-  const login = async (credentials: { email: string; password: string }) => {
+  const login = async (credentials: LoginCredentials) => {
     const response = await authApi.login(credentials);
-    setUser(response.user);
+    handleAuthSuccess(response.user);
   };
 
-  const register = async (userData: { name: string; email: string; password: string }) => {
+  const register = async (userData: RegisterData) => {
     const response = await authApi.register(userData);
-    setUser(response.user);
+    handleAuthSuccess(response.user);
   };
 
   const googleLogin = async (token: string) => {
     const response = await authApi.googleLogin(token);
-    setUser(response.user);
+    handleAuthSuccess(response.user);
   };
 
   const logout = async () => {
     await authApi.logout();
-    setUser(null);
+    // Invalidate the user data in the cache
+    queryClient.setQueryData(['currentUser'], null);
+    router.push('/login'); // Redirect to login page
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        googleLogin,
-        logout,
-        refreshAuth,
-      }}
-    >
+    <AuthContext.Provider value={{ login, register, googleLogin, logout }}>
       {children}
     </AuthContext.Provider>
   );
