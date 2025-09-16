@@ -23,14 +23,16 @@ export class AuthController {
   }
 
   public register = asyncHandler(async (req: Request, res: Response) => {
-    const body = registerSchema.parse({ ...req.body });
-    const { user } = await this.authService.register(body);
+  const body = registerSchema.parse({ ...req.body });
+  const { user } = await this.authService.register(body);
 
-    return res.status(HTTPSTATUS.CREATED).json({
+  return res
+    .status(HTTPSTATUS.CREATED)
+    .json({
       message: "User registered successfully",
       user,
     });
-  });
+});
 
   public login = asyncHandler(async (req: Request, res: Response) => {
     const body = loginSchema.parse(req.body);

@@ -76,6 +76,8 @@ userSchema.methods.toSafeObject = function () {
   const userObject = this.toObject();
   delete userObject.password;
   delete userObject.refreshToken;
+  delete userObject.authProvider;
+  delete userObject.googleId;
   return userObject;
 };
 

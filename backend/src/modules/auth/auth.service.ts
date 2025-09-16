@@ -48,6 +48,42 @@ export class AuthService {
 
     return { user: newUser.toSafeObject() };
   }
+// public async register(registerData: RegisterDto) {
+//   const { name, email, password } = registerData;
+
+//   const existingUser = await UserModel.findOne({ email });
+//   if (existingUser) {
+//     if (existingUser.authProvider === 'google') {
+//       throw new BadRequestException(
+//         "This email is registered with Google. Please use Google Sign-In.",
+//         ErrorCode.AUTH_GOOGLE_ACCOUNT
+//       );
+//     }
+//     throw new BadRequestException(
+//       "User already exists with this email",
+//       ErrorCode.AUTH_EMAIL_ALREADY_EXISTS
+//     );
+//   }
+
+//   const newUser = await UserModel.create({ name, email, password, authProvider: 'local' });
+
+//   // Generate tokens (same as login)
+//   const accessToken = generateAccessToken({
+//     _id: String(newUser._id),
+//     email: newUser.email,
+//     name: newUser.name,
+//   });
+
+//   const refreshToken = generateRefreshToken({
+//     _id: String(newUser._id),
+//   });
+
+//   // Save refresh token to database
+//   newUser.refreshToken = refreshToken;
+//   await newUser.save();
+
+//   return { user: newUser.toSafeObject(), accessToken, refreshToken };
+// }
 
   public async login(loginData: LoginDto) {
     const { email, password } = loginData;
