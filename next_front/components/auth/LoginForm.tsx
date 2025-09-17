@@ -1,8 +1,7 @@
-// components/LoginForm.tsx
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/providers/AuthProvider'; // Updated path
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');

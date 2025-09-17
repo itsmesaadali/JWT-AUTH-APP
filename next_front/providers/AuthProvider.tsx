@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { authApi, LoginCredentials, RegisterData, User } from '@/lib/api/auth.api';
+import { authApi, LoginCredentials, RegisterData, User } from '@/lib/api/auth.api'; // Unchanged
 import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
@@ -19,9 +19,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const router = useRouter();
 
   const handleAuthSuccess = (user: User) => {
-    // Manually set the user data in the cache after login/register
     queryClient.setQueryData(['currentUser'], user);
-    router.push('/dashboard'); // Redirect on success
+    router.push('/dashboard');
   };
 
   const login = async (credentials: LoginCredentials) => {
@@ -41,9 +40,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     await authApi.logout();
-    // Invalidate the user data in the cache
     queryClient.setQueryData(['currentUser'], null);
-    router.push('/login'); // Redirect to login page
+    router.push('/login');
   };
 
   return (

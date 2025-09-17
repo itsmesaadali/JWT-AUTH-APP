@@ -1,7 +1,7 @@
 'use client';
 
-import LoginForm  from '../../components/LoginForm';
-import GoogleSignIn from '../../components/GoogleSignIn';
+import LoginForm from '@/components/auth/LoginForm'; // Updated path
+import GoogleSignIn from '@/components/auth/GoogleSignIn'; // Unchanged
 
 export default function LoginPage() {
   return (
