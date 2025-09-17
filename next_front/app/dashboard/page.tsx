@@ -1,41 +1,56 @@
 'use client';
 
-// Remove the import of useCurrentUser
-// import { useCurrentUser } from '@/hooks/useCurrentUser'; 
-// We will get the user data from a context or a prop if we were to refactor further.
-// For now, we will simply rely on the fact that the page is protected.
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useAuth } from '@/providers/AuthProvider'; // Import the useAuth hook
+import DashboardLoading from './loading';
 
-const DashboardContent = () => {
-  // Now, this is the only place this hook is called for the user data.
+export default function DashboardPage() {
   const { user, isLoading } = useCurrentUser();
+  const { logout } = useAuth(); // Destructure the logout function from useAuth
 
   if (isLoading) {
-    return <div>Loading user details...</div>;
+    return <DashboardLoading />;
   }
-  
+
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Dashboard</h1>
-      <p>Welcome back! 🎉 Only logged-in users can see this page.</p>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        {/* Logout button with an onClick handler */}
+        <button
+          onClick={logout}
+          className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors"
+        >
+          Logout
+        </button>
+      </div>
+
+      <p className="text-lg mb-8">Welcome back! 🎉 Only logged-in users can see this page.</p>
       
       {user && (
-        <div style={{ marginTop: '2rem', border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
-          <h3>User Profile</h3>
-          {user?.avatar && (
-            <img 
-              src={user.avatar} 
-              alt="User Avatar" 
-              style={{ width: '80px', height: '80px', borderRadius: '50%' }} 
-            />
-          )}
-          <p><strong>Name:</strong> {user?.name}</p>
-          <p><strong>Email:</strong> {user?.email}</p>
-          <p><strong>User ID:</strong> {user?._id}</p>
+        <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl">
+          <h3 className="text-xl font-semibold mb-4">User Profile</h3>
+          <div className="flex items-center mb-4">
+            {user?.avatar && (
+              <img 
+                src={user.avatar} 
+                alt="User Avatar" 
+                className="w-20 h-20 rounded-full mr-4" 
+              />
+            )}
+            <div>
+              <p className="text-lg font-medium">{user?.name}</p>
+              <p className="text-gray-600">{user?.email}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-500">User ID</p>
+              <p className="font-mono text-sm">{user?._id}</p>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
-};
-
-export default DashboardContent;
+}
