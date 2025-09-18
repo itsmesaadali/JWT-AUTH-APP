@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await authApi.logout();
     // Clear the user data from the cache
     queryClient.setQueryData(['currentUser'], null);
+    router.push('/login')
   };
 
   // The value provided to components that consume this context
