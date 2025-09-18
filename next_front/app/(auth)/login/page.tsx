@@ -1,39 +1,47 @@
-import LoginForm from '@/components/auth/LoginForm';
-import GoogleSignIn from '@/components/auth/GoogleSignIn';
-import Link from 'next/link';
+"use client"
 
-export default function LoginPage() {
+import { useState } from "react"
+import { LoginForm } from "@/components/auth/LoginForm"
+import { SignupForm } from "@/components/auth/SignupForm"
+import { Button } from "@/components/ui/button"
+
+export default function AuthPage() {
+  const [isLogin, setIsLogin] = useState(true)
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-md">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-        </div>
-        <LoginForm />
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
-            </div>
-          </div>
-          <div className="mt-6 flex justify-center">
-            <GoogleSignIn />
-          </div>
-        </div>
+      <div className="w-full max-w-md space-y-6">
         <div className="text-center">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
-            <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-              Sign up
-            </Link>
-          </p>
+          <div className="flex justify-center space-x-1 mb-6">
+            <Button variant={isLogin ? "default" : "ghost"} onClick={() => setIsLogin(true)} className="px-8">
+              Sign In
+            </Button>
+            <Button variant={!isLogin ? "default" : "ghost"} onClick={() => setIsLogin(false)} className="px-8">
+              Sign Up
+            </Button>
+          </div>
+        </div>
+
+        {isLogin ? <LoginForm /> : <SignupForm />}
+
+        <div className="text-center text-sm text-muted-foreground">
+          {isLogin ? (
+            <>
+              Don't have an account?{" "}
+              <button onClick={() => setIsLogin(false)} className="font-medium text-primary hover:underline">
+                Sign up
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <button onClick={() => setIsLogin(true)} className="font-medium text-primary hover:underline">
+                Sign in
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
-  );
+  )
 }
