@@ -1,7 +1,6 @@
 import app from "./app";
 import connectDB from "./database/database";
 
-// Ensure DB connection only once (for serverless environments)
 let isConnected = false;
 
 const initDB = async () => {
@@ -18,5 +17,4 @@ const initDB = async () => {
 
 initDB();
 
-// Export app as Vercel serverless function handler
 export default app;

@@ -1,17 +1,23 @@
-import mongoose from 'mongoose'
-import { config } from '../config/app.config'
+import mongoose from "mongoose";
+import { config } from "../config/app.config";
+
+let isConnected = false; // track the connection state
 
 const connectDB = async () => {
-    try {
-        await mongoose.connect(config.MONGO_URI, {
-        });
-        console.log('Connect to DB')
-    } catch (error) {
-        console.log(error)
-        console.log('Failed to Connect DB')
-        process.exit(1)
-        
-    }
-}
+  if (isConnected) {
+    return;
+  }
+
+  try {
+    await mongoose.connect(config.MONGO_URI, {
+    });
+    isConnected = true;
+    console.log("✅ Connected to MongoDB");
+  } catch (error) {
+    console.error("❌ Failed to connect to MongoDB:", error);
+    // ❌ Don't use process.exit(1) on Vercel
+    throw error;
+  }
+};
 
 export default connectDB;
