@@ -13,7 +13,7 @@ export const REFRESH_PATH = `/api/v1/auth/refresh`;
 
 const defaults: CookieOptions = {
     httpOnly:true,
-    secure: config.NODE_ENV === 'production',
+    secure: config.NODE_ENV === 'production' ? true : false,
     sameSite: config.NODE_ENV === 'production' ? 'none' : 'lax',
      domain: ".vercel.app", // 👈 share across subdomains
 };
