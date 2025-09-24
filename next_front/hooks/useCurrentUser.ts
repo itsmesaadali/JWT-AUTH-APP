@@ -1,25 +1,16 @@
 // hooks/useCurrentUser.ts
-
-'use client';
-
-import { useQuery } from '@tanstack/react-query';
-import { authApi } from '@/lib/api/auth.api';
+import { useQuery } from "@tanstack/react-query";
+import { authApi } from "@/lib/api/auth.api";
 
 export const useCurrentUser = () => {
-  const { data: user, isLoading, isError } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: authApi.getCurrentUser,
-    retry: false,
+  return useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => {
+      const user = await authApi.getCurrentUser();
+      return user;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // 30 minutes
     refetchOnWindowFocus: false,
-    
-    // Add staleTime: Infinity to ensure cached data is used without refetching
-    staleTime: Infinity, 
   });
-
-  return {
-    user: user || null,
-    isLoading,
-    isError,
-    isAuthenticated: !!user,
-  };
 };

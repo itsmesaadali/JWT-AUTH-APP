@@ -1,46 +1,42 @@
-import { api } from '../utils/axios';
-import {
-  AuthResponse,
-  LoginCredentials,
-  RegisterData,
-  User,
-} from '../types/auth.types'; // Import types from the new file
+// lib/api/auth.api.ts
+import { api } from "../utils/axios";
+import type { AuthResponse, LoginCredentials, RegisterData, User } from "../types/auth.types";
 
 export const authApi = {
   googleLogin: async (token: string) => {
-    const response = await api.post('/auth/google', { token });
-    return response.data;
+    const { data } = await api.post<AuthResponse>("/auth/google", { token });
+    return data;
   },
   register: async (userData: RegisterData) => {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
+    const { data } = await api.post<AuthResponse>("/auth/register", userData);
+    return data;
   },
   login: async (credentials: LoginCredentials) => {
-    const response = await api.post('/auth/login', credentials);
-    return response.data;
+    const { data } = await api.post<AuthResponse>("/auth/login", credentials);
+    return data;
   },
   refreshToken: async () => {
-    const response = await api.get('/auth/refresh');
-    return response.data;
+    const { data } = await api.get("/auth/refresh");
+    return data;
   },
   logout: async () => {
-    const response = await api.post('/auth/logout');
-    return response.data;
+    const { data } = await api.post("/auth/logout");
+    return data;
   },
   forgotPassword: async (email: string) => {
-    const response = await api.post('/auth/password/forgot', { email });
-    return response.data;
+    const { data } = await api.post("/auth/password/forgot", { email });
+    return data;
   },
   resetPassword: async (token: string, newPassword: string) => {
-    const response = await api.post(`/auth/password/reset/${token}`, { newPassword });
-    return response.data;
+    const { data } = await api.post(`/auth/password/reset/${token}`, { newPassword });
+    return data;
   },
-  getCurrentUser: async (): Promise<User> => {
-    const response = await api.get('/users/me');
-    return response.data.user;
+  getCurrentUser: async (): Promise<User | null> => {
+    const { data } = await api.get<{ user: User }>("/users/me");
+    return data?.user ?? null;
   },
   verifyEmail: async (token: string) => {
-    const response = await api.get(`/auth/verify-email/${token}`);
-    return response.data;
+    const { data } = await api.get(`/auth/verify-email/${token}`);
+    return data;
   },
 };

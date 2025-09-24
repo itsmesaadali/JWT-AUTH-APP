@@ -1,3 +1,7 @@
+// components/auth/LoginForm.tsx
+"use client";
+
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,11 +14,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { useAuthActions } from "@/lib/action/action";
 import { Input } from "../ui/input";
-import { useGoogleAuthButton } from "@/hooks/useGoogleAuthButton"; // 👈 new hook
+import { useGoogleAuthButton } from "@/hooks/useGoogleAuthButton";
 
 export function LoginForm() {
   const { login } = useAuthActions();
-  const { isLoading, googleSignInButtonRef, handleCustomGoogleClick } = useGoogleAuthButton();
+  const { isLoading: googleLoading, googleSignInButtonRef, handleCustomGoogleClick } = useGoogleAuthButton();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -22,7 +28,7 @@ export function LoginForm() {
   });
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    await login(values);
+    await login(values, setIsLoading);
   };
 
   return (
@@ -36,12 +42,12 @@ export function LoginForm() {
           variant="outline"
           className="w-full bg-transparent flex items-center justify-center gap-2"
           onClick={handleCustomGoogleClick}
-          disabled={isLoading}
+          disabled={googleLoading}
         >
-          {isLoading ? <Loader2 className="animate-spin h-5 w-5" /> : <FaGoogle className="h-5 w-5 text-black" />}
-          {isLoading ? "Signing in..." : "Continue with Google"}
+          {googleLoading ? <Loader2 className="animate-spin h-5 w-5" /> : <FaGoogle className="h-5 w-5 text-black" />}
+          {googleLoading ? "Signing in..." : "Continue with Google"}
         </Button>
-        <div ref={googleSignInButtonRef} style={{ display: "none" }}></div>
+        <div ref={googleSignInButtonRef} style={{ display: "none" }} />
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center"><Separator className="w-full" /></div>

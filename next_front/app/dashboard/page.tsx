@@ -1,28 +1,25 @@
 'use client';
 
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useAuth } from '@/providers/AuthProvider'; // Import the useAuth hook
-import DashboardLoading from './loading';
+
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import DashboardLoading from "./loading";
 
 export default function DashboardPage() {
-  const { user, isLoading } = useCurrentUser();
-  const { logout } = useAuth(); // Destructure the logout function from useAuth
+  const { data: user, isLoading } = useCurrentUser();
 
-  if (isLoading) {
-    return <DashboardLoading />;
-  }
+   if (isLoading) return <DashboardLoading />;
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         {/* Logout button with an onClick handler */}
-        <button
+        {/* <button
           onClick={logout}
           className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors"
         >
           Logout
-        </button>
+        </button> */}
       </div>
 
       <p className="text-lg mb-8">Welcome back! 🎉 Only logged-in users can see this page.</p>

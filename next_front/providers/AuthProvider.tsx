@@ -1,74 +1,99 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, ReactNode } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
+import React, { createContext, useContext, ReactNode, useEffect } from "react";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { authApi } from "@/lib/api/auth.api";
+import type { LoginCredentials, RegisterData, User } from "@/lib/types/auth.types";
 
-// Import all necessary types and functions from the centralized auth.api file
-import { authApi } from '@/lib/api/auth.api';
-import type { LoginCredentials, RegisterData, User } from '@/lib/types/auth.types';
-
-// Define the shape of our authentication context
 interface AuthContextType {
-  login: (credentials: LoginCredentials) => Promise<void>;
-  register: (userData: RegisterData) => Promise<void>;
-  googleLogin: (token: string) => Promise<void>;
+  user: User | null;
+  login: (credentials: LoginCredentials) => Promise<User>;
+  register: (userData: RegisterData) => Promise<User>;
+  googleLogin: (token: string) => Promise<User>;
   logout: () => Promise<void>;
-  // We can add more properties here as needed, like `isLoading` or `error` state.
+  refetchUser: () => Promise<void>;
 }
 
-// Create the context with an initial undefined value
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// The provider component that will wrap the application
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const queryClient = useQueryClient();
   const router = useRouter();
 
-  // Helper function to handle common post-auth logic
+  // Initialize user on mount
+  useEffect(() => {
+    const initUser = async () => {
+      try {
+        const user = await authApi.getCurrentUser();
+        queryClient.setQueryData(["currentUser"], user);
+      } catch {
+        queryClient.setQueryData(["currentUser"], null);
+      }
+    };
+    initUser();
+  }, [queryClient]);
+
+  const setUser = (user: User | null) => {
+    queryClient.setQueryData(["currentUser"], user);
+  };
+
   const handleAuthSuccess = async (user: User) => {
-    // Set the user data in the cache. Using setQueryData is faster than invalidating.
-    queryClient.setQueryData(['currentUser'], user);
-    router.push('/dashboard');
+    setUser(user);
+    router.push("/dashboard");
   };
 
   const login = async (credentials: LoginCredentials) => {
-    const response = await authApi.login(credentials);
-    handleAuthSuccess(response.user);
+    const data = await authApi.login(credentials);
+    if (!data?.user) throw new Error("Invalid login response");
+    await handleAuthSuccess(data.user);
+    return data.user;
   };
 
   const register = async (userData: RegisterData) => {
-    const response = await authApi.register(userData);
-    handleAuthSuccess(response.user);
+    const data = await authApi.register(userData);
+    if (!data?.user) throw new Error("Invalid register response");
+    await handleAuthSuccess(data.user);
+    return data.user;
   };
 
   const googleLogin = async (token: string) => {
-    const response = await authApi.googleLogin(token);
-    handleAuthSuccess(response.user);
+    const data = await authApi.googleLogin(token);
+    if (!data?.user) throw new Error("Invalid Google login response");
+    await handleAuthSuccess(data.user);
+    return data.user;
   };
 
   const logout = async () => {
-    await authApi.logout();
-    // Clear the user data from the cache
-    queryClient.setQueryData(['currentUser'], null);
-    router.push('/login')
+    try {
+      await authApi.logout();
+    } finally {
+      setUser(null);
+      router.push("/login");
+    }
   };
 
-  // The value provided to components that consume this context
-  const contextValue = { login, register, googleLogin, logout };
+  const refetchUser = async () => {
+    const user = await authApi.getCurrentUser();
+    setUser(user);
+  };
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const currentUser = queryClient.getQueryData<User | null>(["currentUser"]) ?? null;
+
+  const value: AuthContextType = {
+    user: currentUser,
+    login,
+    register,
+    googleLogin,
+    logout,
+    refetchUser,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to easily consume the AuthContext
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
+  return ctx;
 };
