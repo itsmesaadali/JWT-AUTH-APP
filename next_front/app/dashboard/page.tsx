@@ -1,13 +1,12 @@
 'use client';
 
 
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import DashboardLoading from "./loading";
+import useAuth from "@/hooks/use-auth";
 
 export default function DashboardPage() {
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user, isLoading } = useAuth();
 
-   if (isLoading) return <DashboardLoading />;
+   if (isLoading) return <h1>Loading</h1>;
 
   return (
     <div className="container mx-auto px-4 py-8">

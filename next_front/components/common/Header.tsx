@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth } from '@/context/auth-provider';
 import { useRouter } from 'next/navigation';
 
 export default function Header() {

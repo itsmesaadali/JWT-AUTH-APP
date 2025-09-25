@@ -2,7 +2,7 @@
 import { toast } from "react-toastify";
 import { signupSchema, loginSchema } from "@/lib/utils/validateSchema";
 import { z } from "zod";
-import { useAuth } from "@/providers/AuthProvider";
+import { useAuth } from "@/context/auth-provider";
 
 interface AuthActions {
   login: (values: z.infer<typeof loginSchema>, setLoading?: (l: boolean) => void) => Promise<void>;

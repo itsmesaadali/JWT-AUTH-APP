@@ -1,23 +1,27 @@
+// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
-  const url = request.nextUrl;
-  const isAuth = request.cookies.has("accessToken"); // ✅ now cookie will exist
+const protectedRoutes = ["/dashboard"];
+const authRoutes = ["/login", "/signup"];
 
-  // Protect /dashboard
-  if (url.pathname.startsWith("/dashboard") && !isAuth) {
-    return NextResponse.redirect(new URL("/login", request.url));
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get("accessToken")?.value;
+  const { pathname } = request.nextUrl;
+
+  // 🔒 Redirect logged-in users away from auth routes
+  if (token && authRoutes.some((route) => pathname.startsWith(route))) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // Redirect if logged in
-  if ((url.pathname === "/login" || url.pathname === "/") && isAuth) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // 🔑 Redirect unauthenticated users trying to access protected routes
+  if (!token && protectedRoutes.some((route) => pathname.startsWith(route))) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login", "/"],
+  matcher: ["/dashboard/:path*", "/login", "/signup"], 
 };

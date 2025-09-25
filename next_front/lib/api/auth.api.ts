@@ -1,42 +1,23 @@
 // lib/api/auth.api.ts
-import { api } from "../utils/axios";
-import type { AuthResponse, LoginCredentials, RegisterData, User } from "../types/auth.types";
+import API from "../axios-client";
+import type { LoginType, RegisterType } from "../types/auth.types";
 
-export const authApi = {
-  googleLogin: async (token: string) => {
-    const { data } = await api.post<AuthResponse>("/auth/google", { token });
-    return data;
-  },
-  register: async (userData: RegisterData) => {
-    const { data } = await api.post<AuthResponse>("/auth/register", userData);
-    return data;
-  },
-  login: async (credentials: LoginCredentials) => {
-    const { data } = await api.post<AuthResponse>("/auth/login", credentials);
-    return data;
-  },
-  refreshToken: async () => {
-    const { data } = await api.get("/auth/refresh");
-    return data;
-  },
-  logout: async () => {
-    const { data } = await api.post("/auth/logout");
-    return data;
-  },
-  forgotPassword: async (email: string) => {
-    const { data } = await api.post("/auth/password/forgot", { email });
-    return data;
-  },
-  resetPassword: async (token: string, newPassword: string) => {
-    const { data } = await api.post(`/auth/password/reset/${token}`, { newPassword });
-    return data;
-  },
-  getCurrentUser: async (): Promise<User | null> => {
-    const { data } = await api.get<{ user: User }>("/users/me");
-    return data?.user ?? null;
-  },
-  verifyEmail: async (token: string) => {
-    const { data } = await api.get(`/auth/verify-email/${token}`);
-    return data;
-  },
+export const loginMutationFn = async (data: LoginType) => {
+  const res = await API.post("/auth/login", data);
+  return res.data;
+};
+
+export const registerMutationFn = async (data: RegisterType) => {
+  const res = await API.post("/auth/register", data);
+  return res.data;
+};
+
+export const logoutMutationFn = async () => {
+  const res = await API.post("/auth/logout");
+  return res.data;
+};
+
+export const getCurrentUserFn = async () => {
+  const res = await API.get("/users/me");
+  return res.data;   // ✅ only return the user object
 };
