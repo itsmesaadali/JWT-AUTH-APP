@@ -13,13 +13,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: config.APP_ORIGIN,
-    credentials: true,
+    origin: "http://localhost:3000", // or your frontend domain
+    credentials: true, // 👈 required
   })
 );
 
+
 app.use(cookieParser());
 
+app.get('/', (_req: Request, res: Response) => {
+  res.status(200).json({ message: 'Welcome to the API' });
+});
 
 // Health check
 app.get('/health', (_req: Request, res: Response) => {

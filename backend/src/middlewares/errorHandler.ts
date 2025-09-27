@@ -3,6 +3,7 @@ import { HTTPSTATUS } from "../config/http.config";
 import { AppError } from "../common/utils/AppError";
 import {z} from "zod";
 import { clearAuthenticationCookies } from "../common/utils/date-time";
+import { REFRESH_PATH } from "../common/utils/cookie";
 
 const formatZodError = (res:Response, error: z.ZodError) => {
   const errors = error?.issues?.map((err) =>({
@@ -24,7 +25,7 @@ export const errorHandler: ErrorRequestHandler = (
 ): any => {
   console.error(`Error occured on PATH: ${req.path}`, error);
 
-  if(req.path === '/') {
+  if(req.path === REFRESH_PATH) {
     clearAuthenticationCookies(res)
   }
 

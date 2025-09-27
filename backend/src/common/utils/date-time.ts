@@ -1,5 +1,6 @@
 import {add} from 'date-fns'
 import { Response } from 'express';
+import { REFRESH_PATH } from './cookie';
 
 export const ONE_DAY_IN_MS = 24* 60 * 60 * 1000;
 
@@ -49,5 +50,5 @@ export const calculateExpirationDate = (expiresIn: string = '15m'): Date => {
 
 export const clearAuthenticationCookies = (res:Response): Response =>
     res.clearCookie('accessToken').clearCookie('refreshToken', {
-        path:'/',
+        path:REFRESH_PATH,
     })
