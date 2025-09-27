@@ -1,23 +1,15 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 export function middleware(req: NextRequest) {
-  const accessToken = req.cookies.get("accessToken"); // set by backend
+  const accessToken = req.cookies.get('accessToken');
 
-  const isAuthPage = req.nextUrl.pathname.startsWith("/login") || req.nextUrl.pathname.startsWith("/register");
-  const isProtected = req.nextUrl.pathname.startsWith("/dashboard");
-
-  if (isProtected && !accessToken) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
-
-  if (isAuthPage && accessToken) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  if (!accessToken) {
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/login", "/register", "/dashboard/:path*"],
+  matcher: ['/profile'],
 };

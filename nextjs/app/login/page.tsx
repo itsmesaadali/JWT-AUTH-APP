@@ -1,43 +1,33 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
+import { useState, useContext } from 'react';
+import { login, getProfile } from '@/lib/auth';
+import { AuthContext } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation'; // ✅ FIXED
 
 export default function LoginPage() {
-  const { login } = useAuth();
-  const router = useRouter();
-  const [form, setForm] = useState({ email: "", password: "" });
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { setUser } = useContext(AuthContext);
+  const router = useRouter(); // ✅ FIXED
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     try {
-      await login(form);
-      router.push("/dashboard");
-    } catch (err) {
-      alert("Invalid credentials");
+      await login(email, password);
+      const profile = await getProfile();
+      setUser(profile);
+      router.push('/profile'); // ✅ works with next/navigation
+    } catch {
+      alert('Login failed');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md mx-auto mt-10">
-      <input
-        type="email"
-        placeholder="Email"
-        value={form.email}
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-        className="border p-2 rounded"
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={form.password}
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-        className="border p-2 rounded"
-      />
-      <button type="submit" className="bg-blue-600 text-white p-2 rounded">
-        Login
-      </button>
-    </form>
+    <div>
+      <h2>Login</h2>
+      <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" />
+      <input value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" type="password" />
+      <button onClick={handleLogin}>Login</button>
+    </div>
   );
 }
