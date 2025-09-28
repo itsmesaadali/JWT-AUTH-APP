@@ -4,7 +4,6 @@ import { AuthService } from "./auth.service";
 import { HTTPSTATUS } from "../../config/http.config";
 import { emailSchema, loginSchema, registerSchema } from "../../common/validators/auth.validator";
 import {
-  getAccessTokenCookieOptions,
   setAuthenticationCookies,
 } from "../../common/utils/cookie";
 import { BadRequestException, UnauthorizedException } from "../../common/utils/catch-errors";
@@ -36,9 +35,9 @@ export class AuthController {
 
   public login = asyncHandler(async (req: Request, res: Response) => {
     const body = loginSchema.parse(req.body);
-    const { user, accessToken, refreshToken } = await this.authService.login(body);
+    const { user, accessToken } = await this.authService.login(body);
 
-    return setAuthenticationCookies({ res, accessToken, refreshToken })
+    return setAuthenticationCookies({ res, accessToken })
       .status(HTTPSTATUS.OK)
       .json({
         message: "User login successfully",
@@ -54,9 +53,9 @@ export class AuthController {
       throw new BadRequestException("Google token is required");
     }
 
-    const { user, accessToken, refreshToken } = await this.authService.googleAuth(token);
+    const { user, accessToken } = await this.authService.googleAuth(token);
 
-    return setAuthenticationCookies({ res, accessToken, refreshToken })
+    return setAuthenticationCookies({ res, accessToken })
       .status(HTTPSTATUS.OK)
       .json({
         message: "Google authentication successful",
@@ -64,21 +63,7 @@ export class AuthController {
       });
   });
 
-  public refreshToken = asyncHandler(async (req: Request, res: Response) => {
-    const refreshToken = req.cookies?.refreshToken as string | undefined;
-    if (!refreshToken) {
-      throw new UnauthorizedException("User not authorized");
-    }
-
-    const { accessToken } = await this.authService.refreshToken(refreshToken);
-
-    return res
-      .status(HTTPSTATUS.OK)
-      .cookie("accessToken", accessToken, getAccessTokenCookieOptions())
-      .json({
-        message: "Refresh access token successfully",
-      });
-  });
+  
 
   public forgotPassword = asyncHandler(async (req: Request, res: Response) => {
     const email = emailSchema.parse(req.body.email);

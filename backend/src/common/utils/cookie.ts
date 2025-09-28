@@ -5,10 +5,8 @@ import { calculateExpirationDate } from "./date-time";
 type CookiePayloadType = {
     res: Response;
     accessToken:string;
-    refreshToken:string;
 }
 
-export const REFRESH_PATH = `api/v1/auth/refresh`;
 
 const defaults: CookieOptions = {
     httpOnly:true,
@@ -16,15 +14,6 @@ const defaults: CookieOptions = {
     sameSite: config.NODE_ENV === 'production' ? 'strict' : 'lax'
 };
 
-export const getRefreshTokenCookieOptions = ():CookieOptions => {
-    const expiresIn = config.JWT.REFRESH_TOKEN_EXPIRY;
-    const expires = calculateExpirationDate(expiresIn);
-    return {
-        ...defaults,
-        expires,
-        path: REFRESH_PATH,
-    }
-}
 
 export const getAccessTokenCookieOptions = ():CookieOptions => {
     const expiresIn = config.JWT.ACCESS_TOKEN_EXPIRY;
@@ -37,8 +26,7 @@ export const getAccessTokenCookieOptions = ():CookieOptions => {
 }
 
 export const setAuthenticationCookies = ({
-    res, accessToken , refreshToken
+    res, accessToken 
 }:CookiePayloadType): Response => 
     res
     .cookie('accessToken', accessToken, getAccessTokenCookieOptions())
-    .cookie('refreshToken', refreshToken, getRefreshTokenCookieOptions())

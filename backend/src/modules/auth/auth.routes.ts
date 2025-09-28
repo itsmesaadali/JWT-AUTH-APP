@@ -10,7 +10,5 @@ authRoutes.post("/google", authController.googleAuth); // Add Google auth endpoi
 authRoutes.post("/password/forgot", authController.forgotPassword);
 authRoutes.post("/logout", verifyJWT, authController.logout);
 
-// ✅ refresh does NOT need verifyJWT (otherwise access token expiry breaks refresh)
-authRoutes.get("/refresh", authController.refreshToken);
 
 export default authRoutes;

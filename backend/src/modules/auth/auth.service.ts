@@ -3,17 +3,14 @@ import { LoginDto, RegisterDto } from "../../common/interface/auth.interface";
 import {
   BadRequestException,
   NotFoundException,
-  UnauthorizedException,
 } from "../../common/utils/catch-errors";
 import UserModel from "../../database/models/user.model";
 import {
   generateAccessToken,
-  generateRefreshToken,
 } from "../../common/utils/jwt";
 import { config } from "../../config/app.config";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
-import { hashValue } from "../../common/utils/bcrypt";
 
 export class AuthService {
   private googleClient: OAuth2Client;
@@ -118,15 +115,10 @@ export class AuthService {
       name: user.name,
     });
 
-    const refreshToken = generateRefreshToken({
-      _id: String(user._id),
-    });
-
-    // Save refresh token to database
-    user.refreshToken = refreshToken;
+    
     await user.save();
 
-    return { user: user.toSafeObject(), accessToken, refreshToken };
+    return { user: user.toSafeObject(), accessToken };
   }
 
   public async googleAuth(token: string) {
@@ -183,15 +175,10 @@ export class AuthService {
         name: user.name,
       });
 
-      const refreshToken = generateRefreshToken({
-        _id: String(user._id),
-      });
 
-      // Save refresh token to database
-      user.refreshToken = refreshToken;
       await user.save();
 
-      return { user: user.toSafeObject(), accessToken, refreshToken };
+      return { user: user.toSafeObject(), accessToken};
     } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -200,37 +187,6 @@ export class AuthService {
     }
   }
 
-  public async refreshToken(refreshToken: string) {
-    try {
-      const decoded = jwt.verify(
-        refreshToken,
-        config.JWT.REFRESH_TOKEN_SECRET as string
-      ) as { _id: string };
-
-      const user = await UserModel.findById(decoded._id);
-      if (!user || user.refreshToken !== refreshToken) {
-        throw new UnauthorizedException("Invalid refresh token");
-      }
-
-      const accessToken = generateAccessToken({
-        _id: String(user._id),
-        email: user.email,
-        name: user.name,
-      });
-
-      // Optional: Generate a new refresh token and update it in DB
-      const newRefreshToken = generateRefreshToken({
-        _id: String(user._id),
-      });
-
-      user.refreshToken = newRefreshToken;
-      await user.save();
-
-      return { accessToken, refreshToken: newRefreshToken };
-    } catch {
-      throw new UnauthorizedException("Invalid refresh token");
-    }
-  }
 
   public async forgotPassword(email: string) {
     const user = await UserModel.findOne({ email, authProvider: "local" });

@@ -1,13 +1,12 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { compareValue, hashValue } from '../../common/utils/bcrypt';
-import { generateAccessToken, generateRefreshToken } from '../../common/utils/jwt';
+import { generateAccessToken } from '../../common/utils/jwt';
 
 export interface UserDocument extends Document {
   name: string;
   email: string;
   password?: string; // Changed to optional
   avatar: string;
-  refreshToken: string;
   authProvider: 'local' | 'google';
   googleId?: string;
   createdAt: Date;
@@ -29,7 +28,6 @@ const userSchema = new Schema<UserDocument>(
       },
     },
     avatar: { type: String },
-    refreshToken: { type: String },
     authProvider: {
       type: String,
       enum: ['local', 'google'],
@@ -66,16 +64,11 @@ userSchema.methods.createAccessToken = function () {
   });
 };
 
-userSchema.methods.createRefreshToken = function () {
-  return generateRefreshToken({
-    _id: this._id,
-  });
-};
+
 
 userSchema.methods.toSafeObject = function () {
   const userObject = this.toObject();
   delete userObject.password;
-  delete userObject.refreshToken;
   delete userObject.authProvider;
   delete userObject.googleId;
   return userObject;
