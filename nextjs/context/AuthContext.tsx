@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useState, useEffect, ReactNode } from 'react';
-import { getProfile, refreshToken } from '../lib/auth';
+import { getProfile } from '../lib/auth';
 import { User } from '../types/user';
 
 interface AuthContextType {
@@ -18,8 +18,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    refreshToken()
-      .then(() => getProfile())
+    getProfile()
       .then(setUser)
       .catch(() => setUser(null));
   }, []);

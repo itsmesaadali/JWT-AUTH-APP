@@ -3,20 +3,20 @@
 import { useState, useContext } from 'react';
 import { login, getProfile } from '@/lib/auth';
 import { AuthContext } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation'; // ✅ FIXED
+import { useRouter } from 'next/navigation'; 
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { setUser } = useContext(AuthContext);
-  const router = useRouter(); // ✅ FIXED
+  const router = useRouter(); 
 
   const handleLogin = async () => {
     try {
       await login(email, password);
       const profile = await getProfile();
       setUser(profile);
-      router.push('/profile'); // ✅ works with next/navigation
+      router.push('/profile'); 
     } catch {
       alert('Login failed');
     }

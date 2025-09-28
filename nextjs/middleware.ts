@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(req: NextRequest) {
-  const accessToken = req.cookies.get('accessToken');
+export function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const accessToken = request.cookies.get('accessToken')?.value;
 
-  if (!accessToken) {
-    return NextResponse.redirect(new URL('/login', req.url));
+  const protectedRoutes = ['/profile'];
+  const authRoutes = ['/login'];
+
+  if (protectedRoutes.includes(pathname)) {
+    if (!accessToken) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  } else if (authRoutes.includes(pathname)) {
+    if (accessToken) {
+      return NextResponse.redirect(new URL('/profile', request.url));
+    }
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/profile'],
+  matcher: ['/profile', '/login'],
 };
