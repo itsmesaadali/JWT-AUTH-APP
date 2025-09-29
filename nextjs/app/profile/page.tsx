@@ -1,24 +1,29 @@
-'use client';
+"use client";
 
-import { useContext } from 'react';
-import { AuthContext } from '@/context/AuthContext';
-import { logout } from '@/lib/auth';
-import { useRouter } from 'next/navigation';
+import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, logout, isLoading } = useAuth();
   const router = useRouter();
 
-  if (!user) return <p>Loading...</p>;
+  if (isLoading) return <p>Loading...</p>;  // ✅ don’t show "no user" while loading
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      setUser(null);
-      router.push('/login');
-    } catch {
-      alert('Logout failed');
-    }
+  if (!user) return <p>No user found. Please login.</p>;
+
+  const handleLogout = () => {
+    logout(
+      () => {
+        toast.success("Logout successful!");
+        router.push("/");
+      },
+      (error) => {
+        toast.error("Logout failed", {
+          description: error.message || "Please try again later",
+        });
+      }
+    );
   };
 
   return (
