@@ -1,25 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { getSessionCookie } from "better-auth/cookies";
 
-export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  const accessToken = request.cookies.get('accessToken')?.value;
+export async function middleware(request: NextRequest) {
+	const sessionCookie = getSessionCookie(request);
 
-  const protectedRoutes = ['/profile'];
-  const authRoutes = ['/login'];
+    // THIS IS NOT SECURE!
+    // This is the recommended approach to optimistically redirect users
+    // We recommend handling auth checks in each page/route
+	if (!sessionCookie) {
+		return NextResponse.redirect(new URL("/", request.url));
+	}
 
-  if (protectedRoutes.includes(pathname)) {
-    if (!accessToken) {
-      return NextResponse.redirect(new URL('/login', request.url));
-    }
-  } else if (authRoutes.includes(pathname)) {
-    if (accessToken) {
-      return NextResponse.redirect(new URL('/profile', request.url));
-    }
-  }
-
-  return NextResponse.next();
+	return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/profile', '/login'],
+	matcher: ["/dashboard"], // Specify the routes the middleware applies to
 };
