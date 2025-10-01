@@ -21,28 +21,25 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import Loading from "./loading";
+import Loading from "@/components/loading";
 
-import { signUp } from "../server/users";
+import { signIn } from "@/server/users";
 
 import { z } from "zod";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { authClient } from "../lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 
 const formSchema = z.object({
-  username: z
-    .string()
-    .min(3, { message: "Username must contain at least 3 character(s)" }),
   email: z.string().email("Invalid email"),
   password: z
     .string()
     .min(8, { message: "Password must contain at least 8 character(s)" }),
 });
 
-export function SignUpForm({
+export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -54,7 +51,6 @@ export function SignUpForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
     },
@@ -78,11 +74,7 @@ export function SignUpForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       setIsloading(true);
-      const { success, message } = await signUp(
-        values.username,
-        values.email,
-        values.password
-      );
+      const { success, message } = await signIn(values.email, values.password);
 
       if (success) {
         toast.success(message as string);
@@ -100,7 +92,7 @@ export function SignUpForm({
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>Signup with your Google account</CardDescription>
+          <CardDescription>Login with your Google account</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -116,7 +108,7 @@ export function SignUpForm({
                   >
                     {isGoogleLoading ? (
                       <span className="flex items-center justify-center gap-2">
-                        <Loading />Signup...
+                        <Loading />Login...
                       </span>
                     ) : (
                       <>
@@ -130,7 +122,7 @@ export function SignUpForm({
                             fill="currentColor"
                           />
                         </svg>
-                        Signup with Google
+                        Login with Google
                       </>
                     )}
                   </Button>
@@ -141,22 +133,6 @@ export function SignUpForm({
                   </span>
                 </div>
                 <div className="grid gap-6">
-                  {/* Username Field */}
-                  <div className="grid gap-3">
-                    <FormField
-                      control={form.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Username</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Jhon doe" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
                   {/* Email Field */}
                   <div className="grid gap-3">
                     <FormField
@@ -191,7 +167,7 @@ export function SignUpForm({
                             />
                           </FormControl>
                           <Link
-                            href="#"
+                            href="/forgot-password"
                             className="ml-auto text-sm underline-offset-4 hover:underline"
                           >
                             Forgot your password?
@@ -204,14 +180,14 @@ export function SignUpForm({
 
                   {/* Submit Button */}
                   <Button type="submit" className="w-full" disabled={isloading}>
-                    {isloading ? <Loading /> : "Signup"}
+                    {isloading ? <Loading /> : "Login"}
                   </Button>
                 </div>
 
                 <div className="text-center text-sm">
-                  Already have an account?{" "}
-                  <Link href="/login" className="underline underline-offset-4">
-                    Sign in
+                  Don&apos;t have an account?{" "}
+                  <Link href="/signup" className="underline underline-offset-4">
+                    Sign up
                   </Link>
                 </div>
               </div>
