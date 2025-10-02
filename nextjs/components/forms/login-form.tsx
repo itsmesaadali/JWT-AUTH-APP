@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -43,6 +44,8 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const lastMethod = authClient.getLastUsedLoginMethod();
+
   const [isloading, setIsloading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
@@ -101,14 +104,15 @@ export function LoginForm({
                 <div className="flex flex-col gap-4">
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full relative"
                     type="button"
                     onClick={signInWithGoogle}
                     disabled={isGoogleLoading}
                   >
                     {isGoogleLoading ? (
                       <span className="flex items-center justify-center gap-2">
-                        <Loading />Login...
+                        <Loading />
+                        Login...
                       </span>
                     ) : (
                       <>
@@ -123,6 +127,11 @@ export function LoginForm({
                           />
                         </svg>
                         Login with Google
+                        {lastMethod === "google" && (
+                          <Badge className="absolute right-2 text-[9px]">
+                            last used
+                          </Badge>
+                        )}
                       </>
                     )}
                   </Button>
@@ -140,7 +149,12 @@ export function LoginForm({
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <div className="flex items-center justify-between">
+                            <FormLabel>Email</FormLabel>
+                            {lastMethod === "email" && (
+                              <Badge className="text-[9px]">last used</Badge>
+                            )}
+                          </div>
                           <FormControl>
                             <Input placeholder="n@example.com" {...field} />
                           </FormControl>

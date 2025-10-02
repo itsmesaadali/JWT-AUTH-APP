@@ -7,6 +7,7 @@ import { nextCookies } from "better-auth/next-js";
 import { Resend } from 'resend'
 import ForgotPasswordEmail from "@/components/emails/reset-password";
 import EmailVerification from "@/components/emails/verify-email";
+import { lastLoginMethod } from "better-auth/plugins"
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
@@ -44,7 +45,7 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
-  plugins:[nextCookies()]
+  plugins:[lastLoginMethod(),nextCookies()]
 });
 
 
