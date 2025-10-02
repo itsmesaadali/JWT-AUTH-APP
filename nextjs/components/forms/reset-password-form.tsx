@@ -72,7 +72,7 @@ export function ResetPasswordForm({
         toast.error(error.message);
       } else {
         toast.success("Password reset successfully");
-        router.push('/login')
+        router.push('/auth/login')
       }
     } finally {
       setIsloading(false);
@@ -135,7 +135,7 @@ export function ResetPasswordForm({
 
                 <div className="text-center text-sm">
                   Don&apos;t have an account?{" "}
-                  <Link href="/signup" className="underline underline-offset-4">
+                  <Link href="/auth/signup" className="underline underline-offset-4">
                     Sign up
                   </Link>
                 </div>

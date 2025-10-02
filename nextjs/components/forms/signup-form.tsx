@@ -86,7 +86,7 @@ export function SignUpForm({
 
       if (success) {
         toast.success(`${message as string} Please check your email for verification`);
-        router.push("/");
+        router.push("/auth/verify-email");
       } else {
         toast.error(message as string);
       }
@@ -210,7 +210,7 @@ export function SignUpForm({
 
                 <div className="text-center text-sm">
                   Already have an account?{" "}
-                  <Link href="/login" className="underline underline-offset-4">
+                  <Link href="/auth/login" className="underline underline-offset-4">
                     Sign in
                   </Link>
                 </div>

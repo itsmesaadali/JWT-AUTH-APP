@@ -57,7 +57,7 @@ export function ForgotPasswordForm({
 
         const { error } = await authClient.forgetPassword({
             email:values.email,
-            redirectTo:'/reset-password'
+            redirectTo:'/auth/reset-password'
         })
 
       if (error) {
@@ -109,7 +109,7 @@ export function ForgotPasswordForm({
 
                 <div className="text-center text-sm">
                   Don&apos;t have an account?{" "}
-                  <Link href="/signup" className="underline underline-offset-4">
+                  <Link href="/auth/signup" className="underline underline-offset-4">
                     Sign up
                   </Link>
                 </div>

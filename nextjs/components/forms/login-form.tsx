@@ -143,7 +143,7 @@ export function LoginForm({
                 </div>
                 <div className="grid gap-6">
                   {/* Email Field */}
-                  <div className="grid gap-3">
+                  <div className="grid gap-3">  
                     <FormField
                       control={form.control}
                       name="email"
@@ -200,7 +200,7 @@ export function LoginForm({
 
                 <div className="text-center text-sm">
                   Don&apos;t have an account?{" "}
-                  <Link href="/signup" className="underline underline-offset-4">
+                  <Link href="/auth/signup" className="underline underline-offset-4">
                     Sign up
                   </Link>
                 </div>
