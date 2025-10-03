@@ -24,21 +24,15 @@ import {
 import Loading from "@/components/loading";
 
 import { z } from "zod";
+import { resetPassFormSchema } from '@/lib/validation'  
 import { toast } from "sonner";
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const formSchema = z
-  .object({
-    password: z.string().min(8, "Password must be at least 8 character(s)"),
-    confirmPassword: z.string().min(8, "Confirm Password is required"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ["confirmPassword"],
-  });
+
+
 export function ResetPasswordForm({
   className,
   ...props
@@ -51,15 +45,15 @@ export function ResetPasswordForm({
 
   const [isloading, setIsloading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof resetPassFormSchema>>({
+    resolver: zodResolver(resetPassFormSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof resetPassFormSchema>) {
     try {
       setIsloading(true);
 

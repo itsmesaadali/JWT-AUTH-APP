@@ -25,20 +25,14 @@ import Loading from "@/components/loading";
 
 import { signIn } from "@/server/users";
 
-import { z } from "zod";
+import z from "zod";
+import { loginFormSchema } from "@/lib/validation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-
-const formSchema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z
-    .string()
-    .min(8, { message: "Password must contain at least 8 character(s)" }),
-});
 
 export function LoginForm({
   className,
@@ -51,8 +45,8 @@ export function LoginForm({
 
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof loginFormSchema>>({
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -74,7 +68,7 @@ export function LoginForm({
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof loginFormSchema>) {
     try {
       setIsloading(true);
       const { success, message } = await signIn(values.email, values.password);

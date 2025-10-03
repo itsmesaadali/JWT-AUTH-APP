@@ -26,21 +26,13 @@ import Loading from "@/components/loading";
 import { signUp } from "@/server/users";
 
 import { z } from "zod";
+import { signupFormSchema } from "@/lib/validation";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 
-const formSchema = z.object({
-  username: z
-    .string()
-    .min(3, { message: "Username must contain at least 3 character(s)" }),
-  email: z.string().email("Invalid email"),
-  password: z
-    .string()
-    .min(8, { message: "Password must contain at least 8 character(s)" }),
-});
 
 export function SignUpForm({
   className,
@@ -51,8 +43,8 @@ export function SignUpForm({
 
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof signupFormSchema>>({
+    resolver: zodResolver(signupFormSchema),
     defaultValues: {
       username: "",
       email: "",
@@ -75,7 +67,7 @@ export function SignUpForm({
     }
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof signupFormSchema>) {
     try {
       setIsloading(true);
       const { success, message } = await signUp(

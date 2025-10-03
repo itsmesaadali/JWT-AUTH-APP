@@ -25,15 +25,13 @@ import Loading from "@/components/loading";
 
 
 import { z } from "zod";
+import { forgotPassFormSchema } from '@/lib/validation'
 import { toast } from "sonner";
 import { useState } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 
-const formSchema = z.object({
-  email: z.string().email("Invalid email"),
 
-});
 
 export function ForgotPasswordForm({
   className,
@@ -42,8 +40,8 @@ export function ForgotPasswordForm({
   const [isloading, setIsloading] = useState(false);
 
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof forgotPassFormSchema>>({
+    resolver: zodResolver(forgotPassFormSchema),
     defaultValues: {
       email: "",
     },
@@ -51,7 +49,7 @@ export function ForgotPasswordForm({
 
   
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof forgotPassFormSchema>) {
     try {
       setIsloading(true);
 
