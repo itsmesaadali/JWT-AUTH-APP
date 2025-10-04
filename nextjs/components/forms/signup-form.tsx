@@ -57,7 +57,7 @@ export function SignUpForm({
       setIsGoogleLoading(true);
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: "/",
       });
     } catch (error) {
       console.error(error);

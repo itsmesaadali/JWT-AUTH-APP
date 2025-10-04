@@ -58,7 +58,7 @@ export function LoginForm({
       setIsGoogleLoading(true);
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: "/",
       });
     } catch (error) {
       console.error(error);
@@ -75,7 +75,7 @@ export function LoginForm({
 
       if (success) {
         toast.success(message as string);
-        router.push("/dashboard");
+        router.push("/");
       } else {
         toast.error(message as string);
       }

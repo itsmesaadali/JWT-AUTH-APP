@@ -38,7 +38,7 @@ export default function RootLayout({
           >
           <Navbar />
           <main>{children}
-            <Toaster/>
+            <Toaster richColors/>
           </main>
           </ThemeProvider>
       </body>

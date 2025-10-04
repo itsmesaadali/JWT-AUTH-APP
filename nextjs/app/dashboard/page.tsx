@@ -1,9 +1,12 @@
-import { Logout } from "@/components/logout";
+import { ProfileDashboard } from "./_components/ProfileDashboard";
+import { requireUserAndSession } from "../data/auth/require-user";
 
-export default function Dashboard () {
-    return <div className="flex flex-col items-center justify-center h-screen">
-        Dashboard page 
-        
-        <Logout/>
+export default async function Dashboard() {
+  const { user } = await requireUserAndSession();
+
+  return (
+    <div>
+      <ProfileDashboard user={user} />
     </div>
+  );
 }
