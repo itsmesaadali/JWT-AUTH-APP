@@ -7,7 +7,6 @@ export default async function Dashboard() {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if(!session){
-    console.error("no session start")
     redirect('/auth/login')
   }
 

@@ -8,6 +8,7 @@ import { AccountSecuritySection } from "./AccountSecuritySection";
 
 import { Button } from "@/components/ui/button";
 import { Monitor } from "lucide-react";
+import DeleteAccount from "./DeleteAccount";
 
 // define props type
 interface ProfileDashboardProps {
@@ -48,6 +49,7 @@ export function ProfileDashboard({ user }: ProfileDashboardProps) {
       <ProfilePictureSection user={user} />
       <PersonalInfoSection user={user} />
       <AccountSecuritySection user={user} />
+      <DeleteAccount/>
     </div>
   );
 }

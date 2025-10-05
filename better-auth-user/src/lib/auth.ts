@@ -3,7 +3,6 @@
 import { db } from "@/db/drizzle";
 import { schema } from "@/db/schema";
 
-
 // Better auth imports
 
 import { betterAuth } from "better-auth";
@@ -20,25 +19,25 @@ import UpdateVerifyEmail from "@/components/emails/update-email";
 
 const resend = new Resend(process.env.RESEND_API_KEY as string);
 
-
-
-
 export const auth = betterAuth({
   user: {
     changeEmail: {
       enabled: true,
-     sendChangeEmailVerification: async({user, url})=> {
-       resend.emails.send({
-        from: "onboarding@resend.dev",
-        to: user.email,
-        subject: 'Approve email change',
-        react: UpdateVerifyEmail({
-          companyName: 'Better auth web',
-          verifyUrl: url,
-          userEmail: user.email,
-        }),
-      });
-     },
+      sendChangeEmailVerification: async ({ user, url }) => {
+        resend.emails.send({
+          from: "onboarding@resend.dev",
+          to: user.email,
+          subject: "Approve email change",
+          react: UpdateVerifyEmail({
+            companyName: "Better auth web",
+            verifyUrl: url,
+            userEmail: user.email,
+          }),
+        });
+      },
+    },
+    deleteUser: {
+      enabled: true,
     },
   },
   emailVerification: {
@@ -58,11 +57,11 @@ export const auth = betterAuth({
   },
   socialProviders: {
     google: {
-        prompt: "select_account",  
-            clientId: process.env.GOOGLE_CLIENT_ID as string, 
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string, 
+      prompt: "select_account",
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
-},
+  },
   emailAndPassword: {
     enabled: true,
     sendResetPassword: async ({ user, url }) => {
@@ -79,11 +78,11 @@ export const auth = betterAuth({
     },
     requireEmailVerification: true,
   },
-  session:{
-      cookieCache:{
-        enabled:true,
-        maxAge:60 * 5 // 5 mintues
-      }
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 30,
+    },
   },
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -92,5 +91,4 @@ export const auth = betterAuth({
   plugins: [lastLoginMethod(), nextCookies()],
 });
 
-
-export type Session =typeof auth.$Infer.Session;
+export type Session = typeof auth.$Infer.Session;

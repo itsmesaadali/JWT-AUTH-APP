@@ -8,20 +8,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Clock, Monitor, Smartphone, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Clock, Monitor, Smartphone} from "lucide-react";
 import { Session } from "better-auth";
-import { useState } from "react";
 import {
   parseUserAgent,
   getBrowserInfo,
   formatDate,
   getDeviceType,
 } from "../../../utils/sessionUtils";
-import { authClient } from "../../../../lib/auth-client";
-import { toast } from "sonner";
-import { Spinner } from "../../../../components/ui/spinner";
-import { redirect } from "next/navigation";
 
 export function CurrentSession({
   session,
@@ -30,28 +24,10 @@ export function CurrentSession({
   session: Session;
   isCurrentSession?: boolean;
 }) {
-  const [revoking, setRevoking] = useState(false);
+
   const userAgentInfo = parseUserAgent(session.userAgent!);
   const deviceType = getDeviceType(userAgentInfo);
 
-  const handleRevoke = async () => {
-    if (revoking) return;
-    setRevoking(true);
-    try {
-      const res = await authClient.revokeSession({ token: session.token });
-
-      if (res.error) {
-        toast.error("Fail to revoke other session");
-      } else {
-        toast.success("Session revoke successfully");
-      }
-      redirect('/auth/login')
-    } catch (error:any) {
-      toast.error(error.message || "Failed to revoke session");
-    } finally {
-      setRevoking(false);
-    }
-  };
 
   return (
     <Card className="mb-6 border-primary">
@@ -64,8 +40,8 @@ export function CurrentSession({
             </CardDescription>
           </div>
           {isCurrentSession && (
-            <Badge className="bg-green-500 hover:bg-green-600 animate-pulse">
-              Active
+            <Badge className="bg-white animate-pulse">
+              current session
             </Badge>
           )}
         </div>
@@ -93,16 +69,6 @@ export function CurrentSession({
             </div>
           </div>
         </div>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={handleRevoke}
-          disabled={revoking}
-          className="mt-4"
-        >
-          <Trash2 className="h-4 w-4 mr-1" />
-          {revoking ? <Spinner/> : "Revoke"}
-        </Button>
       </CardContent>
     </Card>
   );
