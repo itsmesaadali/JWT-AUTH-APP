@@ -1,31 +1,28 @@
 "use client";
 
 import { LogOutIcon } from "lucide-react";
-import { signOut } from "../lib/auth-client";
-import { Button } from "./ui/button";
+import { signOut } from "@/lib/auth-client"; // your auth signOut
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export function LogoutButton() {
   const router = useRouter();
+
   const handleLogout = async () => {
     try {
       await signOut();
-      toast("Logged Out", {
-        description: "You have been logged out successfully.",
-      });
-      router.push("/");
-    } catch (error) {
-        toast("Logout Failed", {
-        description: "Something went wrong. Please try again.",
-      });
+      toast("You have been logged out successfully.");
+      router.push("/"); // redirect to home
+    } catch (error: any) {
+      toast(error.message || "Something went wrong. Please try again.");
     }
-   
   };
 
   return (
     <Button
-      variant="destructive"
+      variant="ghost"
+      size="sm"
       onClick={handleLogout}
       className="flex items-center gap-2"
     >

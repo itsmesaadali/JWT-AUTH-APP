@@ -8,7 +8,6 @@ import { AccountSecuritySection } from "./AccountSecuritySection";
 
 import { Button } from "@/components/ui/button";
 import { Monitor } from "lucide-react";
-import { LogoutButton } from "@/components/logout";
 
 // define props type
 interface ProfileDashboardProps {
@@ -43,7 +42,6 @@ export function ProfileDashboard({ user }: ProfileDashboardProps) {
               Sessions
             </a>
           </Button>
-          <LogoutButton />
         </div>
       </div>
 

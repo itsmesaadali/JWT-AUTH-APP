@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Loader2 } from "lucide-react";
+import { Camera } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 import { authClient } from "../../../../lib/auth-client";
@@ -58,16 +58,11 @@ export function ProfilePictureSection({ user }: ProfilePictureSectionProps) {
         await authClient.updateUser({
           image: newPic,
         });
-        toast("Profile Picture Updated", {
-          description: "Your profile picture has been updated successfully.",
-        });
+        toast.success("Profile Picture Updated");
         router.refresh();
-      } catch (error) {
+      } catch (error: any) {
         setProfilePicture(tempPic);
-        toast.error("Failed to Update Profile Picture", {
-          description:
-            error instanceof Error ? error.message : "Something went wrong.",
-        });
+        toast.error(error.message || "Something went wrong.");
       } finally {
         setIsUploading(false);
       }

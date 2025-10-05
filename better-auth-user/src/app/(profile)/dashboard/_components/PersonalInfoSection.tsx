@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { User, Loader2 } from "lucide-react";
+import { User } from "lucide-react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -43,18 +43,12 @@ export function PersonalInfoSection({ user }: { user: { name: string } }) {
         name: data.name,
       });
 
-      toast("Profile Updated", {
-        description: "Your name has been updated successfully.",
-      });
+      toast.success("Your name has been updated successfully.");
 
-      reset({ name: data.name }); 
+      reset({ name: data.name });
       router.refresh();
-    } catch (error) {
-      console.error("Failed to update name:", error);
-      toast.error("Failed to Update Profile", {
-        description:
-          error instanceof Error ? error.message : "Something went wrong.",
-      });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to Update Profile");
     }
   };
 
@@ -85,11 +79,7 @@ export function PersonalInfoSection({ user }: { user: { name: string } }) {
             </div>
 
             <Button type="submit" disabled={!isDirty || isSubmitting}>
-              {isSubmitting ? (
-                <Spinner/>
-              ) : (
-                "Update"
-              )}
+              {isSubmitting ? <Spinner /> : "Update"}
             </Button>
           </div>
         </form>

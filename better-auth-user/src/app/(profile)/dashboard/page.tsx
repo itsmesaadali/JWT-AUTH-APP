@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import { ProfileDashboard } from "./_components/ProfileDashboard";
-import { authClient } from "@/lib/auth-client";
+import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 
 export default async function Dashboard() {
-  const { data: session } = await authClient.getSession()
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if(!session){
     console.error("no session start")
