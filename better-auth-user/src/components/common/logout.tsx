@@ -12,10 +12,10 @@ export function LogoutButton() {
   const handleLogout = async () => {
     try {
       await signOut();
-      toast("You have been logged out successfully.");
+      toast.success("You have been logged out successfully.");
       router.push("/"); // redirect to home
     } catch (error: any) {
-      toast(error.message || "Something went wrong. Please try again.");
+      toast.error(error.message || "Something went wrong. Please try again.");
     }
   };
 
