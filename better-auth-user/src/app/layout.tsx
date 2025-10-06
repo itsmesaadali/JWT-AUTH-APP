@@ -32,7 +32,9 @@ export default async function RootLayout({
         <Navbar  />
         {children}
 
-        <Toaster richColors/>
+        <Toaster
+          richColors
+        />
       </body>
     </html>
   );

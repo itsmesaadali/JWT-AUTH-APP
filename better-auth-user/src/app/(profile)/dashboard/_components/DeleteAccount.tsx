@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { redirect } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -46,12 +45,7 @@ const DeleteAccount = () => {
       if (error) {
         toast.error(error.message || "Failed to delete account.");
       } else {
-        toast.success("Account Deleted", {
-          description: "Your account has been permanently deleted.",
-        });
-        setTimeout(() => {
         window.location.href = "/auth/login";
-      }, 600);
       }
     } catch (err: any) {
       toast.error("Failed to Delete Account", {
@@ -152,7 +146,7 @@ const DeleteAccount = () => {
             >
               {loading ? (
                 <>
-                  <Spinner/>
+                  <Spinner />
                   Deleting...
                 </>
               ) : (
