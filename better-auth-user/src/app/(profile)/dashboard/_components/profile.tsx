@@ -5,7 +5,6 @@ import {
   User,
   Mail,
   Lock,
-  Camera,
   Monitor,
   Trash2,
   Shield,
@@ -127,12 +126,6 @@ export function ProfileSettings({ user, setUser }: ProfileSettingsProps) {
     setConfirmPassword("")
   }
 
-  const handleAvatarChange = () => {
-    toast(
-       "Avatar updated",{
-      description: "Your profile picture has been updated.",
-    })
-  }
 
   const handleToggle2FA = () => {
     const newState = !twoFactorEnabled
@@ -160,7 +153,8 @@ export function ProfileSettings({ user, setUser }: ProfileSettingsProps) {
   }
 
   return (
-    <div className="container max-w-6xl py-8 px-6">
+    <div className="min-h-screen flex items-center justify-center py-5 px-4 bg-background">
+      <div className="w-full max-w-5xl">
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
@@ -188,10 +182,6 @@ export function ProfileSettings({ user, setUser }: ProfileSettingsProps) {
                 </div>
               </div>
             </div>
-            <Button onClick={handleAvatarChange} size="sm" variant="outline">
-              <Camera className="mr-2 h-4 w-4" />
-              Change
-            </Button>
           </div>
         </CardContent>
       </Card>
@@ -456,6 +446,7 @@ export function ProfileSettings({ user, setUser }: ProfileSettingsProps) {
           </Card>
         </TabsContent>
       </Tabs>
+    </div>
     </div>
   )
 }
