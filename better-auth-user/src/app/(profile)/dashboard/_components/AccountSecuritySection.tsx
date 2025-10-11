@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock } from "lucide-react";
 import { ChangeEmailForm } from "./ChangeEmailForm";
-import { ChangePasswordForm } from "./ChangePasswordForm";
+import { ChangePasswordForm } from "./Security-info";
 
 export function AccountSecuritySection({ user }: { user: { email: string } }) {
   return (

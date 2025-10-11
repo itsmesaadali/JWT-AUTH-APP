@@ -10,7 +10,7 @@ export default async function Dashboard() {
   if (!session) redirect("/auth/login");
 
   return (
-    <div className="min-h-screen bg-background py-5 px-4">
+    <div>
       <ProfileSettings user={session.user} />
     </div>
   );

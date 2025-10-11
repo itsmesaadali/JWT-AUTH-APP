@@ -3,7 +3,7 @@
 // app/dashboard/_components/ProfileDashboard.tsx
 
 import { ProfilePictureSection } from "./ProfilePictureSection";
-import { PersonalInfoSection } from "./PersonalInfoSection";
+import { PersonalInfoSection } from "./Profile-info";
 import { AccountSecuritySection } from "./AccountSecuritySection";
 
 import { Button } from "@/components/ui/button";
