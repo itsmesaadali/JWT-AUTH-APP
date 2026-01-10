@@ -22,7 +22,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import z from "zod";
 
 export default function CreatePage() {
@@ -34,6 +33,7 @@ export default function CreatePage() {
     defaultValues: {
       title: "",
       content: "",
+      image: undefined,
     },
   });
 
@@ -80,6 +80,7 @@ export default function CreatePage() {
                   </Field>
                 )}
               />
+              
               <Controller
                 name="content"
                 control={form.control}
@@ -98,6 +99,29 @@ export default function CreatePage() {
                 )}
               />
 
+              <Controller
+                name="image"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field>
+                    <FieldLabel>Image</FieldLabel>
+                    <Input
+                      type="file"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Enter the title"
+                      onChange={(e) => {
+
+                        const file = e.target.files?.[0];
+                        field.onChange(file);
+                      }}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              
               <Button disabled={isPending}>
                 {isPending ? (
                   <>

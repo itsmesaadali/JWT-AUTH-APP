@@ -7,7 +7,11 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "./loading";
 
+export const dynamic = "force-static";
+
+
 export default async function BlogPage() {
+
   return (
     <div className="py-8">
       <div className="text-center mb-10">
@@ -25,8 +29,7 @@ export default async function BlogPage() {
 }
 
 async function LoadPosts() {
-
-    const data = await fetchQuery(api.posts.getPosts, {});
+  const data = await fetchQuery(api.posts.getPosts, {});
 
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -34,11 +37,13 @@ async function LoadPosts() {
         <Card key={post._id} className="pt-0">
           <div className="h-50 w-full overflow-hidden relative">
             <Image
-              src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src={
+                post.imageUrl ??
+                "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              }
               alt="blog image"
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </div>
           <CardContent>

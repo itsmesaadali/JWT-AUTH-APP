@@ -6,6 +6,11 @@ const nextConfig: NextConfig = {
       { hostname: "images.unsplash.com",
         protocol: "https",
        }
+       ,
+       {
+        hostname: "original-stork-538.convex.cloud"
+        ,protocol: "https",
+       }
 
     ]
 
