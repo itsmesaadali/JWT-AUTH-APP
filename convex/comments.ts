@@ -5,32 +5,34 @@ import { authComponent } from "./auth";
 export const getCommentsbyBlog = query({
   args: { postId: v.id("posts") },
   handler: async (ctx, args) => {
-    const data = await ctx.db.query("comments").filter(q => q.eq(q.field("postId"), args.postId)).order("desc").collect();
+    const data = await ctx.db
+      .query("comments")
+      .filter((q) => q.eq(q.field("postId"), args.postId))
+      .order("desc")
+      .collect();
 
     return data;
   },
 });
 
 export const createComment = mutation({
-    args:{
-        content: v.string(),
-        postId: v.id("posts"),
-    },
+  args: {
+    content: v.string(),
+    postId: v.id("posts"),
+  },
 
-    handler: async (ctx, args) => {
-        
-        const user = await authComponent.safeGetAuthUser(ctx);
-            
-        if(!user) {
-              throw new ConvexError("Unauthorized");
-        }
-        
-        return await ctx.db.insert("comments", {
-            postId: args.postId,
-            content: args.content,
-            authorId: user._id,
-            authorName: user.name,
-        });
+  handler: async (ctx, args) => {
+    const user = await authComponent.safeGetAuthUser(ctx);
+
+    if (!user) {
+      throw new ConvexError("Unauthorized");
     }
 
+    return await ctx.db.insert("comments", {
+      postId: args.postId,
+      content: args.content,
+      authorId: user._id,
+      authorName: user.name,
+    });
+  },
 });

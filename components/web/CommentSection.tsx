@@ -11,47 +11,60 @@ import { Textarea } from "../ui/textarea";
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
-import { useMutation } from "convex/react";
+import { Preloaded, useMutation, usePreloadedQuery, useQuery } from "convex/react";
 import z from "zod";
 import { toast } from "sonner";
 import { useTransition } from "react";
 import { Spinner } from "../ui/spinner";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { Separator } from "../ui/separator";
 
-export function CommentSection() {
+
+
+
+export function CommentSection(props: {preloadedComments: Preloaded<typeof api.comments.getCommentsbyBlog>}) {
+
+  const params = useParams<{ blogId: Id<"posts"> }>();
+
+  const data = usePreloadedQuery(props.preloadedComments);
+
   const [isPending, startTransition] = useTransition();
 
   const createComment = useMutation(api.comments.createComment);
-  const params = useParams();
-  const postId = params.postId as Id<"posts">;
-
+  
   const form = useForm({
     resolver: zodResolver(commentSchema),
     defaultValues: {
       content: "",
+      postId: params.blogId,
     },
   });
 
   function onSubmit(values: z.infer<typeof commentSchema>) {
-    if (!postId) return toast.error("Post not found");
 
     startTransition(async () => {
-      await createComment({
-        content: values.content,
-        postId,
-      });
-      toast.success("Comment created");
-      form.reset({ content: "" });
+      try {
+        
+        await createComment(values);
+        form.reset();
+        toast.success("Comment created");
+      } catch (error) {
+        toast.error("Failed to create comment");
+      }
     });
   }
-
+  
+  if(data === undefined) {
+    return <Spinner />;
+  }
   
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2 border-b pb-4">
         <MessageSquare className="size-3" />
-        <h2 className="font-bold">5 Comments</h2>
+        <h2 className="font-bold">{data.length === 0 ? "No Comments" : `${data.length} Comments`}</h2>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-6">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <Controller
             name="content"
@@ -81,6 +94,33 @@ export function CommentSection() {
             )}
           </Button>
         </form>
+
+            {data?.length > 0 && <Separator />}
+
+            <section className="space-y-6">
+              {data?.map((comment) => (
+                <div key={comment._id} className="flex gap-4">
+                  <Avatar className="size-5 shrink-0"> 
+
+                    <AvatarImage  src={`https://avatar.vercel.sh/${comment.authorName}`}
+                    alt={comment.authorName}
+                    />
+                    <AvatarFallback>
+                      {comment.authorName.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                    
+                  </Avatar>
+
+                  <div className="flex-1 space-y-1"> 
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold text-sm">{comment.authorName}</p>
+                      <p className="text-muted-foreground text-xs">{new Date(comment._creationTime).toLocaleDateString()}</p>
+                    </div>
+                    <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">{comment.content}</p>
+                  </div>
+                </div>
+              ))}
+            </section>
       </CardContent>
     </Card>
   );

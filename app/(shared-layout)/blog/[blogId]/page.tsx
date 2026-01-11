@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import Image from "next/image";
-import { fetchQuery } from "convex/nextjs";
+import { fetchQuery, preloadQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Separator } from "@/components/ui/separator";
@@ -14,11 +14,19 @@ interface BlogIdPageProps {
 
 export default async function BlogIdPage({ params }: BlogIdPageProps) {
   const { blogId } = await params;
-  const post = await fetchQuery(api.posts.getPostById, { postId: blogId });
+
+  const [post, preloadedComments] = await Promise.all([
+    fetchQuery(api.posts.getPostById, { postId: blogId }),
+    preloadQuery(api.comments.getCommentsbyBlog, { postId: blogId }),
+  ]);
+
   if (!post) {
     return (
       <div className="max-w-3xl mx-auto py-8 px-4 animate-in fade-in duration-500 relative">
-        <Link href={"/blog"} className={buttonVariants({ variant: "ghost", className: "mb-4" })}>
+        <Link
+          href={"/blog"}
+          className={buttonVariants({ variant: "ghost", className: "mb-4" })}
+        >
           <ArrowLeft className="size-4" />
           Back to blog
         </Link>
@@ -29,7 +37,10 @@ export default async function BlogIdPage({ params }: BlogIdPageProps) {
 
   return (
     <div className="max-w-3xl mx-auto py-8 px-4 animate-in fade-in duration-500 relative">
-      <Link href={"/blog"} className={buttonVariants({ variant: "ghost", className: "mb-4" })}>
+      <Link
+        href={"/blog"}
+        className={buttonVariants({ variant: "ghost", className: "mb-4" })}
+      >
         <ArrowLeft className="size-4" />
         Back to blog
       </Link>
@@ -48,16 +59,17 @@ export default async function BlogIdPage({ params }: BlogIdPageProps) {
 
       <div className="space -y-4 flex flex-col">
         <h1 className="text-xl font-bold mb-4 tracking-tight">{post.title}</h1>
-        <p className="text-muted-foreground text-sm">Posted on: {new Date(post._creationTime).toLocaleDateString()}</p>
-      </div>
-      <Separator className="my-4"/>
-        <p className="text-lg leading-relaxed text-foreground/90">
-          {post.content}
+        <p className="text-muted-foreground text-sm">
+          Posted on: {new Date(post._creationTime).toLocaleDateString()}
         </p>
-        <Separator className="my-4"/>
+      </div>
+      <Separator className="my-4" />
+      <p className="text-lg leading-relaxed text-foreground/90">
+        {post.content}
+      </p>
+      <Separator className="my-4" />
 
-        <CommentSection />
-
+      <CommentSection preloadedComments={preloadedComments} />
     </div>
   );
 }
