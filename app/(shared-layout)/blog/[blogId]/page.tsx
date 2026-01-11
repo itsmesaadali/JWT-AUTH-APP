@@ -6,6 +6,7 @@ import { fetchQuery } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Separator } from "@/components/ui/separator";
+import { CommentSection } from "@/components/web/CommentSection";
 
 interface BlogIdPageProps {
   params: Promise<{ blogId: Id<"posts"> }>;
@@ -53,6 +54,10 @@ export default async function BlogIdPage({ params }: BlogIdPageProps) {
         <p className="text-lg leading-relaxed text-foreground/90">
           {post.content}
         </p>
+        <Separator className="my-4"/>
+
+        <CommentSection />
+
     </div>
   );
 }

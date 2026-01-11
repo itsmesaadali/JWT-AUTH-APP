@@ -7,5 +7,11 @@ export default defineSchema({
         content: v.string(),
         authorId: v.string(),
         imageStoreId: v.optional(v.id("_storage")),
-    })
+    }),
+    comments: defineTable({
+        postId: v.id("posts"),
+        authorId: v.string(),
+        authorName: v.string(),
+        content: v.string(),
+    }),
 });
