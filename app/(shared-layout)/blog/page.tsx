@@ -6,9 +6,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "./loading";
+import { Metadata } from "next";
 
 export const dynamic = "force-static";
+export const revalidate = 60;
 
+export const metadata:Metadata = {
+  title:"My Blog",
+  description:"Read the latest articles and insights on our blog.",
+  category: "Web Development",
+  authors: [{ name: "Saad Ali" }],
+}
 
 export default async function BlogPage() {
 

@@ -7,17 +7,40 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Separator } from "@/components/ui/separator";
 import { CommentSection } from "@/components/web/CommentSection";
+import { Metadata } from "next";
+import { PostPresence } from "@/components/web/PostPresence";
 
 interface BlogIdPageProps {
   params: Promise<{ blogId: Id<"posts"> }>;
 }
+export async function generateMetadata({params} : BlogIdPageProps): Promise<Metadata> {
+  const {blogId} = await params;
+
+  const post = await fetchQuery(api.posts.getPostById, { postId: blogId });
+
+  if (!post) {
+    return {
+      title: "Post Not Found",
+      description: "The requested blog post could not be found.",
+    };
+  }
+
+  return {
+    title: post.title,
+    description: post.content.slice(0, 60), // First 60 characters as description
+    authors: [{ name: post.authorId }],
+    category: "Web Development",
+  };
+}
+
 
 export default async function BlogIdPage({ params }: BlogIdPageProps) {
   const { blogId } = await params;
 
-  const [post, preloadedComments] = await Promise.all([
+  const [post, preloadedComments, userId] = await Promise.all([
     fetchQuery(api.posts.getPostById, { postId: blogId }),
     preloadQuery(api.comments.getCommentsbyBlog, { postId: blogId }),
+    fetchQuery(api.presence.getUserId, {}),
   ]);
 
   if (!post) {
@@ -59,9 +82,12 @@ export default async function BlogIdPage({ params }: BlogIdPageProps) {
 
       <div className="space -y-4 flex flex-col">
         <h1 className="text-xl font-bold mb-4 tracking-tight">{post.title}</h1>
-        <p className="text-muted-foreground text-sm">
+          <div>
+             <p className="text-muted-foreground text-sm">
           Posted on: {new Date(post._creationTime).toLocaleDateString()}
         </p>
+        { userId && <PostPresence roomId={post._id} userId={userId} />}
+          </div>
       </div>
       <Separator className="my-4" />
       <p className="text-lg leading-relaxed text-foreground/90">
