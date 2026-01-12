@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📝 NextBlog
 
-## Getting Started
+**NextBlog** is a modern full-stack blogging platform built with **Next.js (App Router)**, **Convex**, **shadcn/ui**, and **TypeScript**. It supports authentication, blog creation with image uploads, real-time comments, and a clean responsive UI.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Features
+
+- 🔐 Authentication (login required to post & comment)
+- ✍️ Create blog posts with image uploads
+- 🖼 Image storage via Convex file storage
+- 💬 Real-time comments per post
+- 👀 Presence indicator for readers
+- ⚡ Fast server actions with Next.js
+- 🎨 Clean UI with shadcn/ui + Tailwind
+- 📱 Fully responsive design
+
+---
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|------|-----------|
+Frontend | Next.js 14 (App Router), React, TypeScript |
+Backend | Convex |
+UI | Tailwind CSS, shadcn/ui |
+Forms | react-hook-form, Zod |
+Auth | Custom auth (Convex + Next middleware) |
+Storage | Convex file storage |
+
+---
+
+## 📂 Project Structure
+
+```text
+app/
+ ├─ blog/
+ ├─ create/
+ ├─ actions.ts
+ ├─ schemas/
+components/
+ ├─ web/
+ ├─ ui/
+convex/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+- git clone https://github.com/itsmesaadali/nextblog.git
+- cd nextblog
+```
+ 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+- pnpm install
+# or
+- npm install
+```
 
-## Learn More
+```
+CONVEX_DEPLOYMENT=your-convex-deployment
+NEXT_PUBLIC_CONVEX_URL=your-convex-url
+```
 
-To learn more about Next.js, take a look at the following resources:
+```
+npx convex dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+pnpm dev
+# or
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
