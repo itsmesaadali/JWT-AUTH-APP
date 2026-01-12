@@ -9,6 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { CommentSection } from "@/components/web/CommentSection";
 import { Metadata } from "next";
 import { PostPresence } from "@/components/web/PostPresence";
+import { getToken } from "@/lib/auth-server";
+import { redirect } from "next/navigation";
 
 interface BlogIdPageProps {
   params: Promise<{ blogId: Id<"posts"> }>;
@@ -37,11 +39,17 @@ export async function generateMetadata({params} : BlogIdPageProps): Promise<Meta
 export default async function BlogIdPage({ params }: BlogIdPageProps) {
   const { blogId } = await params;
 
+  const token = await getToken();
+
   const [post, preloadedComments, userId] = await Promise.all([
     fetchQuery(api.posts.getPostById, { postId: blogId }),
     preloadQuery(api.comments.getCommentsbyBlog, { postId: blogId }),
-    fetchQuery(api.presence.getUserId, {}),
+    fetchQuery(api.presence.getUserId, {}, { token }),
   ]);
+
+  if(!userId) { 
+    return redirect('/auth/login');
+  }
 
   if (!post) {
     return (
@@ -82,7 +90,7 @@ export default async function BlogIdPage({ params }: BlogIdPageProps) {
 
       <div className="space -y-4 flex flex-col">
         <h1 className="text-xl font-bold mb-4 tracking-tight">{post.title}</h1>
-          <div>
+          <div className="flex items-center gap-2">
              <p className="text-muted-foreground text-sm">
           Posted on: {new Date(post._creationTime).toLocaleDateString()}
         </p>

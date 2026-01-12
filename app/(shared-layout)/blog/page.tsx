@@ -7,9 +7,9 @@ import Link from "next/link";
 import { Suspense } from "react";
 import Loading from "./loading";
 import { Metadata } from "next";
+import { connection } from "next/server";
+import { cacheLife, cacheTag } from "next/cache";
 
-export const dynamic = "force-static";
-export const revalidate = 60;
 
 export const metadata:Metadata = {
   title:"My Blog",
@@ -37,6 +37,9 @@ export default async function BlogPage() {
 }
 
 async function LoadPosts() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("blog-posts");
   const data = await fetchQuery(api.posts.getPosts, {});
 
   return (

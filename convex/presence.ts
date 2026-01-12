@@ -1,6 +1,6 @@
 import { mutation, query } from "./_generated/server";
 import { components } from "./_generated/api";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { Presence } from "@convex-dev/presence";
 import { authComponent } from "./auth";
 
@@ -15,6 +15,13 @@ export const heartbeat = mutation({
   },
   handler: async (ctx, { roomId, userId, sessionId, interval }) => {
     // TODO: Add your auth checks here.
+
+    const user = await authComponent.safeGetAuthUser(ctx);
+
+    if(!user || user._id !== userId) {
+        throw new ConvexError("Unauthorized");
+    }
+
     return await presence.heartbeat(ctx, roomId, userId, sessionId, interval);
   },
 });
@@ -23,7 +30,22 @@ export const list = query({
   args: { roomToken: v.string() },
   handler: async (ctx, { roomToken }) => {
     // Avoid adding per-user reads so all subscriptions can share same cache.
-    return await presence.list(ctx, roomToken);
+    const entries = await presence.list(ctx, roomToken);
+    return await Promise.all(
+      entries.map(async (entry) => {
+        const user = await authComponent.getAnyUserById(ctx, entry.userId);
+
+        if (!user) {
+          return entry;
+        }
+
+        return {
+          ...entry,
+          name: user.name,
+
+        };
+      })
+    );
   },
 });
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import usePresence from "@convex-dev/presence/react";
@@ -17,7 +19,7 @@ export function PostPresence({ roomId, userId }: PostPresenceProps) {
 
   return <div className="flex items-center gap-2">
     <p className="text-xs uppercase tracking-wide text-muted-foreground" >Viewing now</p>
-    <div>
+    <div className="text-black">
     <FacePile presenceState={presenceState } />
     </div>
 
