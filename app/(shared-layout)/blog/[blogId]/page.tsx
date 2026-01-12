@@ -11,6 +11,7 @@ import { Metadata } from "next";
 import { PostPresence } from "@/components/web/PostPresence";
 import { getToken } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
+import { FormattedDate } from "@/components/web/FormattedDate";
 
 interface BlogIdPageProps {
   params: Promise<{ blogId: Id<"posts"> }>;
@@ -66,44 +67,54 @@ export default async function BlogIdPage({ params }: BlogIdPageProps) {
     );
   }
 
-  return (
-    <div className="max-w-3xl mx-auto py-8 px-4 animate-in fade-in duration-500 relative">
-      <Link
-        href={"/blog"}
-        className={buttonVariants({ variant: "ghost", className: "mb-4" })}
-      >
-        <ArrowLeft className="size-4" />
-        Back to blog
-      </Link>
+return (
+  <div className="max-w-3xl mx-auto py-10 px-4">
+    <Link
+      href="/blog"
+      className={buttonVariants({
+        variant: "ghost",
+        className: "mb-6 flex w-fit items-center gap-2 text-sm",
+      })}
+    >
+      <ArrowLeft className="size-4" />
+      Back to blog
+    </Link>
 
-      <div className="relative w-full h-100 mb-8 overflow-hidden xl shadow-sm">
+    <div className="space-y-6">
+      <div className="relative w-full h-80 overflow-hidden rounded-xl border border-border">
         <Image
           src={
             post.imageUrl ??
-            "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+            "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=1170&auto=format&fit=crop"
           }
           alt={post.title}
           fill
-          className="object-cover hover:scale-105 transition-transform duration-300"
+          className="object-cover transition-transform duration-300 hover:scale-105"
         />
       </div>
 
-      <div className="space -y-4 flex flex-col">
-        <h1 className="text-xl font-bold mb-4 tracking-tight">{post.title}</h1>
-          <div className="flex items-center gap-2">
-             <p className="text-muted-foreground text-sm">
-          Posted on: {new Date(post._creationTime).toLocaleDateString()}
-        </p>
-        { userId && <PostPresence roomId={post._id} userId={userId} />}
-          </div>
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight">{post.title}</h1>
+
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span>
+            Posted on <FormattedDate timestamp={post._creationTime} />
+          </span>
+          {userId && <PostPresence roomId={post._id} userId={userId} />}
+        </div>
       </div>
-      <Separator className="my-4" />
-      <p className="text-lg leading-relaxed text-foreground/90">
+
+      <Separator />
+
+      <p className="leading-relaxed text-foreground/90 whitespace-pre-line">
         {post.content}
       </p>
-      <Separator className="my-4" />
+
+      <Separator />
 
       <CommentSection preloadedComments={preloadedComments} />
     </div>
-  );
+  </div>
+);
+
 }

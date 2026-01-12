@@ -60,7 +60,7 @@ export function SearchInput() {
                   onClick={() => setOpen(false)}
                   className="block p-2 hover:bg-accent hover:text-accent-foreground rounded"
                 >
-                  <p className="truncate font-medium text-white">{post.title}</p>
+                  <p className="truncate font-medium dark:not-last:text-white">{post.title}</p>
                   <p className="text-xs text-muted-foreground pt-1">
                     {post.content.substring(0, 60)}
                   </p>

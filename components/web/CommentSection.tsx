@@ -11,7 +11,12 @@ import { Textarea } from "../ui/textarea";
 import { useParams } from "next/navigation";
 import { Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
-import { Preloaded, useMutation, usePreloadedQuery, useQuery } from "convex/react";
+import {
+  Preloaded,
+  useMutation,
+  usePreloadedQuery,
+  useQuery,
+} from "convex/react";
 import z from "zod";
 import { toast } from "sonner";
 import { useTransition } from "react";
@@ -19,11 +24,9 @@ import { Spinner } from "../ui/spinner";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 
-
-
-
-export function CommentSection(props: {preloadedComments: Preloaded<typeof api.comments.getCommentsbyBlog>}) {
-
+export function CommentSection(props: {
+  preloadedComments: Preloaded<typeof api.comments.getCommentsbyBlog>;
+}) {
   const params = useParams<{ blogId: Id<"posts"> }>();
 
   const data = usePreloadedQuery(props.preloadedComments);
@@ -31,7 +34,7 @@ export function CommentSection(props: {preloadedComments: Preloaded<typeof api.c
   const [isPending, startTransition] = useTransition();
 
   const createComment = useMutation(api.comments.createComment);
-  
+
   const form = useForm({
     resolver: zodResolver(commentSchema),
     defaultValues: {
@@ -41,10 +44,8 @@ export function CommentSection(props: {preloadedComments: Preloaded<typeof api.c
   });
 
   function onSubmit(values: z.infer<typeof commentSchema>) {
-
     startTransition(async () => {
       try {
-        
         await createComment(values);
         form.reset();
         toast.success("Comment created");
@@ -53,16 +54,18 @@ export function CommentSection(props: {preloadedComments: Preloaded<typeof api.c
       }
     });
   }
-  
-  if(data === undefined) {
+
+  if (data === undefined) {
     return <Spinner />;
   }
-  
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center gap-2 border-b pb-4">
         <MessageSquare className="size-3" />
-        <h2 className="font-bold">{data.length === 0 ? "No Comments" : `${data.length} Comments`}</h2>
+        <h2 className="font-bold">
+          {data.length === 0 ? "No Comments" : `${data.length} Comments`}
+        </h2>
       </CardHeader>
       <CardContent className="space-y-6">
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -95,32 +98,45 @@ export function CommentSection(props: {preloadedComments: Preloaded<typeof api.c
           </Button>
         </form>
 
-            {data?.length > 0 && <Separator />}
+        {data?.length > 0 && <Separator />}
 
-            <section className="space-y-6">
-              {data?.map((comment) => (
-                <div key={comment._id} className="flex gap-4">
-                  <Avatar className="size-5 shrink-0"> 
-
-                    <AvatarImage  src={`https://avatar.vercel.sh/${comment.authorName}`}
+        <div
+          className={
+            data.length > 2
+              ? "max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+              : ""
+          }
+        >
+          <section className="space-y-6">
+            {data.map((comment) => (
+              <div key={comment._id} className="flex gap-4">
+                <Avatar className="size-5 shrink-0">
+                  <AvatarImage
+                    src={`https://avatar.vercel.sh/${comment.authorName}`}
                     alt={comment.authorName}
-                    />
-                    <AvatarFallback>
-                      {comment.authorName.slice(0, 2).toUpperCase()}
-                    </AvatarFallback>
-                    
-                  </Avatar>
+                  />
+                  <AvatarFallback>
+                    {comment.authorName.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
 
-                  <div className="flex-1 space-y-1"> 
-                    <div className="flex items-center justify-between">
-                      <p className="font-semibold text-sm">{comment.authorName}</p>
-                      <p className="text-muted-foreground text-xs">{new Date(comment._creationTime).toLocaleDateString()}</p>
-                    </div>
-                    <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">{comment.content}</p>
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-sm">
+                      {comment.authorName}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {new Date(comment._creationTime).toLocaleDateString()}
+                    </p>
                   </div>
+                  <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">
+                    {comment.content}
+                  </p>
                 </div>
-              ))}
-            </section>
+              </div>
+            ))}
+          </section>
+        </div>
       </CardContent>
     </Card>
   );

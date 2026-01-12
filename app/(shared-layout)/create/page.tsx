@@ -23,8 +23,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function CreatePage() {
+
+    const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
 
@@ -37,11 +41,18 @@ export default function CreatePage() {
     },
   });
 
- function onSubmit(data: z.infer<typeof BlogPostSchema>) {
+function onSubmit(data: z.infer<typeof BlogPostSchema>) {
   startTransition(async () => {
-    await createBlogAction(data);
+    const result = await createBlogAction(data);
+
+    if (result?.success === false) {
+      toast.error(result.error ?? "Failed to create blog post");
+    }
   });
 }
+
+
+
 
   return (
     <div className="py-8">

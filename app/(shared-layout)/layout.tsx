@@ -1,3 +1,4 @@
+import { Footer } from "@/components/web/Footer";
 import { Navbar } from "@/components/web/navbar";
 
 export default function SharedLayout({children}: {children: React.ReactNode}) {
@@ -5,6 +6,7 @@ export default function SharedLayout({children}: {children: React.ReactNode}) {
         <>
         <Navbar />
         {children}
+        <Footer />
         </>
     )
 }
