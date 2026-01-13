@@ -4,47 +4,58 @@ import z from "zod";
 import { BlogPostSchema } from "./schemas/blog";
 import { fetchMutation } from "convex/nextjs";
 import { api } from "@/convex/_generated/api";
-import { getToken } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
+import { getToken } from "@/lib/auth-server";
+import { revalidatePath, updateTag } from "next/cache";
 
 export async function createBlogAction(data: z.infer<typeof BlogPostSchema>) {
-  const parsed = BlogPostSchema.safeParse(data);
-  if (!parsed.success) {
-    return { success: false, error: "Invalid blog post data" };
-  }
 
-  const token = await getToken();
+  try {
 
-  // 1️⃣ Upload image
-  const uploadUrl = await fetchMutation(
+    const parsed = BlogPostSchema.safeParse(data);
+    
+    if (!parsed.success) {
+      throw new Error("Invalid blog post data");
+    }
+
+    const token = await getToken();
+
+  const imageUrl = await fetchMutation(
     api.posts.generateImageUploadUrl,
     {},
     { token }
   );
 
-  const uploadResult = await fetch(uploadUrl, {
+  const uploadResult = await fetch(imageUrl, {
     method: "POST",
     headers: { "Content-Type": parsed.data.image.type },
     body: parsed.data.image,
   });
 
   if (!uploadResult.ok) {
-    return { success: false, error: "Image upload failed" };
+     return { error: "Image upload failed" };
   }
 
-  const { storageId } = await uploadResult.json();
+    const { storageId } = await uploadResult.json();
 
-  // 2️⃣ Create post
-  await fetchMutation(
-    api.posts.createPost,
-    {
-      title: parsed.data.title,
-      content: parsed.data.content,
-      imageStoreId: storageId,
-    },
-    { token }
-  );
+    await fetchMutation(
+      api.posts.createPost,
+      {
+        title: parsed.data.title,
+        content: parsed.data.content,
+        imageStoreId: storageId,
+      },
+      { token }
+    );
 
-  // 3️⃣ Redirect — last line
-  redirect("/blog");
+
+  } catch {
+    return { error: "Failed to create blog post" }; 
+  }
+
+
+  updateTag("blog");
+  return redirect("/blog");
+
+
 }

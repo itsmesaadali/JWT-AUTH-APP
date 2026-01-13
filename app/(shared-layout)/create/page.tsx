@@ -23,14 +23,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 export default function CreatePage() {
-
-    const router = useRouter();
   const [isPending, startTransition] = useTransition();
-
 
   const form = useForm({
     resolver: zodResolver(BlogPostSchema),
@@ -41,18 +36,13 @@ export default function CreatePage() {
     },
   });
 
-function onSubmit(data: z.infer<typeof BlogPostSchema>) {
-  startTransition(async () => {
-    const result = await createBlogAction(data);
-
-    if (result?.success === false) {
-      toast.error(result.error ?? "Failed to create blog post");
-    }
-  });
-}
-
-
-
+  async function onSubmit(data: z.infer<typeof BlogPostSchema>) {
+    startTransition(async () => {
+      await createBlogAction(data);
+    });
+    
+    
+  }
 
   return (
     <div className="py-8">
@@ -72,7 +62,6 @@ function onSubmit(data: z.infer<typeof BlogPostSchema>) {
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            
             <FieldGroup>
               <Controller
                 name="title"
@@ -91,7 +80,7 @@ function onSubmit(data: z.infer<typeof BlogPostSchema>) {
                   </Field>
                 )}
               />
-              
+
               <Controller
                 name="content"
                 control={form.control}
@@ -121,7 +110,6 @@ function onSubmit(data: z.infer<typeof BlogPostSchema>) {
                       aria-invalid={fieldState.invalid}
                       placeholder="Enter the title"
                       onChange={(e) => {
-
                         const file = e.target.files?.[0];
                         field.onChange(file);
                       }}
@@ -132,7 +120,7 @@ function onSubmit(data: z.infer<typeof BlogPostSchema>) {
                   </Field>
                 )}
               />
-              
+
               <Button disabled={isPending}>
                 {isPending ? (
                   <>

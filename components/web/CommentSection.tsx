@@ -27,7 +27,7 @@ import { Separator } from "../ui/separator";
 export function CommentSection(props: {
   preloadedComments: Preloaded<typeof api.comments.getCommentsbyBlog>;
 }) {
-  const params = useParams<{ blogId: Id<"posts"> }>();
+  const params = useParams<{ postId: Id<"posts"> }>();
 
   const data = usePreloadedQuery(props.preloadedComments);
 
@@ -39,7 +39,7 @@ export function CommentSection(props: {
     resolver: zodResolver(commentSchema),
     defaultValues: {
       content: "",
-      postId: params.blogId,
+      postId: params.postId,
     },
   });
 

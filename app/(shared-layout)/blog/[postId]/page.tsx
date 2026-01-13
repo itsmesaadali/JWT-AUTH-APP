@@ -13,13 +13,12 @@ import { getToken } from "@/lib/auth-server";
 import { redirect } from "next/navigation";
 import { FormattedDate } from "@/components/web/FormattedDate";
 
-interface BlogIdPageProps {
-  params: Promise<{ blogId: Id<"posts"> }>;
+interface PostIdPageProps {
+  params: Promise<{ postId: Id<"posts"> }>;
 }
-export async function generateMetadata({params} : BlogIdPageProps): Promise<Metadata> {
-  const {blogId} = await params;
-
-  const post = await fetchQuery(api.posts.getPostById, { postId: blogId });
+export async function generateMetadata({params} : PostIdPageProps): Promise<Metadata> {
+  const {postId} = await params;
+  const post = await fetchQuery(api.posts.getPostById, { postId: postId });
 
   if (!post) {
     return {
@@ -30,21 +29,21 @@ export async function generateMetadata({params} : BlogIdPageProps): Promise<Meta
 
   return {
     title: post.title,
-    description: post.content.slice(0, 60), // First 60 characters as description
+    description: post.content.slice(0, 60), 
     authors: [{ name: post.authorId }],
     category: "Web Development",
   };
 }
 
 
-export default async function BlogIdPage({ params }: BlogIdPageProps) {
-  const { blogId } = await params;
+export default async function PostIdPage({ params }: PostIdPageProps) {
+  const { postId } = await params;
 
   const token = await getToken();
 
   const [post, preloadedComments, userId] = await Promise.all([
-    fetchQuery(api.posts.getPostById, { postId: blogId }),
-    preloadQuery(api.comments.getCommentsbyBlog, { postId: blogId }),
+    fetchQuery(api.posts.getPostById, { postId: postId }),
+    preloadQuery(api.comments.getCommentsbyBlog, { postId: postId }),
     fetchQuery(api.presence.getUserId, {}, { token }),
   ]);
 
