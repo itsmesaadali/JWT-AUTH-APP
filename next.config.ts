@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
        }
        ,
        {
-        hostname: "original-stork-538.convex.cloud"
+        hostname: "cool-cormorant-507.convex.cloud"
         ,protocol: "https",
        }
 
