@@ -37,6 +37,8 @@ export default async function BlogPage() {
 }
 
 async function LoadPosts() {
+  try{
+
   "use cache";
   cacheLife("hours");
   cacheTag("blog");
@@ -78,4 +80,15 @@ async function LoadPosts() {
       ))}
     </div>
   );
+  } catch (error) {
+    console.error("Failed to load posts:", error);
+    return (
+      <div className="text-center py-10">
+        <p className="text-muted-foreground">
+          Failed to load posts. Please try again later.
+        </p>
+      </div>
+    );
+  }
+
 }
